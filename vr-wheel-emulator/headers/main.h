@@ -7,13 +7,48 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/euler_angles.hpp>
+#include <cmath>
 
 const double PI = 3.14159265358979323846;
 
-struct Vector3 {
-	float x;
-	float y;
-	float z;
+class Vector3 {
+public:
+    float x;
+    float y;
+    float z;
+
+    Vector3(float x_value, float y_value, float z_value) {
+        x = x_value;
+        y = y_value;
+        z = z_value;
+    }
+
+    Vector3()
+    {
+        x = 0;
+        y = 0;
+        z = 0;
+    }
+};
+
+class Vector2 {
+public:
+    float x, y;
+
+    Vector2(float x_value, float y_value) {
+        x = x_value;
+        y = y_value;
+    }
+
+    Vector2()
+    {
+        x = 0;
+        y = 0;
+    }
+
+    float GetMagnitude() {
+        return hypot(x, y);
+    }
 };
 
 Vector3 GetRotation(vr::IVRSystem *pSystem) {
@@ -46,6 +81,7 @@ Vector3 GetRotation(vr::IVRSystem *pSystem) {
         Rotation.z = roll;
         return Rotation;
     }
+    else return *(new Vector3());
 }
 
 void PrintRotation(Vector3 rotation) {
