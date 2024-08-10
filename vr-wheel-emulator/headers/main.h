@@ -52,6 +52,10 @@ void PrintRotation(Vector3 rotation) {
 	std::cout << "rotation: " << rotation.x << ' ' << rotation.y << ' ' << rotation.z << '\n';
 }
 
+/// <summary>
+/// radians * (180 /pi) = degree (not needed anymore because glm stuff)
+/// </summary>
+/// <param name="Rotation"></param>
 void ConvertToDegrees(Vector3* Rotation) {
     Rotation->x *= (180 / (float)PI);
     Rotation->y *= (180 / (float)PI);
