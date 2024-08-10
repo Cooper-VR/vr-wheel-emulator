@@ -70,6 +70,10 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LibraryPath>lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -128,6 +132,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="vr-wheel-emulator.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="headers\openvr.h" />
+    <ClInclude Include="headers\openvr_driver.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="dll\openvr_api.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="lib\openvr_api.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
