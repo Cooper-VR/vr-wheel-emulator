@@ -26,9 +26,13 @@
     <ClInclude Include="headers\openvr_driver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="headers\main.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="dll\openvr_api.dll" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="lib\openvr_api.lib" />
