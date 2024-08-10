@@ -1,0 +1,9 @@
+1. get an overlay working in c++
+2. get input (rotation + button + axis)
+3. senitivity changer for grip and axis
+
+4. setup input emulator
+5. get triggers as buttons
+6. setup selection wheel like VRC
+7. translate them to assetto corsa
+8. drive
