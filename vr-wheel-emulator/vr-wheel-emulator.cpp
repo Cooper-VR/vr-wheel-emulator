@@ -44,14 +44,14 @@ int main()
 						std::cout << "up-shift";
 					}
 					else if (axis_right.y < -gear_shift_sense) {
-						std::cout << "down-shift"
+						std::cout << "down-shift";
 					}
 				}
 				if (rightControllerState.ulButtonPressed & vr::ButtonMaskFromId(vr::k_EButton_ApplicationMenu)) {
 					std::cout << "b-button-right pressed\n";
 				}
 				if (rightControllerState.ulButtonPressed & vr::ButtonMaskFromId(vr::k_EButton_Axis0)) {
-					std::cout << "joystick Pressed in\n";
+					//std::cout << "joystick Pressed in\n";
 				}
 				if (rightControllerState.ulButtonPressed & vr::ButtonMaskFromId(vr::k_EButton_Grip)) {
 					std::cout << "gripping wheel\n";
@@ -79,14 +79,43 @@ int main()
 					* 180 - 252 = handbrake
 					* 252 - -36 = brake
 					*/
+					float angle = std::atan(axis_left.y / axis_left.x);
+					angle *= (180 / PI);
 
-					std::cout << "joystick amount: " << axis_left.x << ", " << axis_left.y << '\n';
+					//for handling the restricted domain of arctan
+					if (axis_left.x < 0 && axis_left.y < 0) {
+						angle += 180;
+					}
+					else if (axis_left.x < 0) {
+						angle += 180;
+					}else if (axis_left.y < 0){
+						angle += 360;
+					}	
+
+					if (angle < 36 && angle > 360 - 36) {
+						currentMode = clutch;
+					}
+					else if (angle >= 36 && angle < 108) {
+						currentMode = headlights;
+					}
+					else if (angle >= 108 && angle < 180) {
+						currentMode = horn;
+					}
+					else if (angle >= 180 && angle < 252) {
+						currentMode = handBrake;
+					}
+					else {
+						currentMode = brake;
+					}
+
+					
+					std::cout << angle << ":" << currentMode << '\n';
 				}
 				if (leftControllerState.ulButtonPressed & vr::ButtonMaskFromId(vr::k_EButton_ApplicationMenu)) {
 					std::cout << "b-button-left pressed\n";
 				}
 				if (leftControllerState.ulButtonPressed & vr::ButtonMaskFromId(vr::k_EButton_Axis0)) {
-					std::cout << "joystick Pressed in\n";
+					//std::cout << "joystick Pressed in\n";
 				}
 				if (leftControllerState.ulButtonPressed & vr::ButtonMaskFromId(vr::k_EButton_Grip)) {
 					std::cout << "gripping\n";

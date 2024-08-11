@@ -109,9 +109,11 @@ enum leftHandModes {
     handBrake = 11,
     headlights = 12,
     horn = 13,
-    clutch = 14
+    clutch = 14,
+    none = 9
 };
 
+leftHandModes currentMode = none;
 Vector3 rotation_right;
 Vector3 rotation_left;
 vr::TrackedDeviceIndex_t rightControllerIndex;
