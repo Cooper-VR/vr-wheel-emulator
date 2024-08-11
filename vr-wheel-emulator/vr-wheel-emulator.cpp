@@ -1,7 +1,8 @@
 #include <iostream>
 #include "headers/openvr.h"
 #include "headers/main.h"
-
+#include <chrono>
+#include <thread>
 
 
 int main()
@@ -15,68 +16,55 @@ int main()
 	}
 	std::cout << "OpenVR initalized\n";
 
-	//std::cout << pSystem->IsTrackedDeviceConnected(vr::k_unTrackedDeviceIndex_Hmd+1) << '\n';
-
-	vr::ETrackedDeviceProperty deviceProp = vr::Prop_RenderModelName_String;
-
-	vr::ETrackedPropertyError dError;
-	int BufferSize = 256;
-	char *propString = new char[BufferSize];
 	
-	//for me  +3 is left controller, +4 is right, +1||+2 are base stations
-	pSystem->GetStringTrackedDeviceProperty(vr::k_unTrackedDeviceIndex_Hmd + 4, deviceProp, propString, BufferSize, &dError) << '\n';
-	if (dError != vr::TrackedProp_Success) {
-		std::cout << "failed?: " << dError;
-		return -2;
-	}
-	std::string trackingSystemName(propString);
-	std::cout << trackingSystemName << '\n';
-	//can use render models ot tell difference
-
 	vr::TrackedDevicePose_t trackedDevicesPose[vr::k_unMaxTrackedDeviceCount];
+	rightControllerIndex = pSystem->GetTrackedDeviceIndexForControllerRole(vr::TrackedControllerRole_RightHand);
+	leftControllerIndex = pSystem->GetTrackedDeviceIndexForControllerRole(vr::TrackedControllerRole_RightHand);
 
-	Vector3 rotation;
-
-	vr::TrackedDeviceIndex_t rightControllerIndex = pSystem->GetTrackedDeviceIndexForControllerRole(vr::TrackedControllerRole_RightHand);
-	vr::TrackedDeviceIndex_t leftControllerIndex = pSystem->GetTrackedDeviceIndexForControllerRole(vr::TrackedControllerRole_RightHand);
-
-	
 	while (1) {
-		rotation = GetRotation(pSystem);
-		//PrintRotation(rotation);
+		rotation_right = GetRotation(pSystem);
+		rotation_left = GetRotation(pSystem);
 
-
-		vr::VRControllerState_t state;
+		
 		pSystem->GetControllerState(rightControllerIndex, &state, sizeof(state));
 		
 		if (rightControllerIndex != vr::k_unTrackedDeviceIndexInvalid) {
-			vr::VRControllerState_t rightControllerState;
 			
 			if (pSystem->GetControllerState(rightControllerIndex, &rightControllerState, sizeof(rightControllerState))) {
-				float triggerValue = rightControllerState.rAxis[1].x;
-				Vector2 *axis = new Vector2(rightControllerState.rAxis[0].x, rightControllerState.rAxis[0].y);
+				triggerValue_right = rightControllerState.rAxis[1].x;
+				axis_right.x = rightControllerState.rAxis->x;
+				axis_right.y = rightControllerState.rAxis->y;
 
-				if (triggerValue > 0) {
-					std::cout << "trigger amount: " << triggerValue << std::endl;
+				if (triggerValue_right > 0) {
+					std::cout << "trigger amount: " << triggerValue_right << std::endl;
 				}
-				if (axis->GetMagnitude() > 0.1f) {
-					std::cout << axis->GetMagnitude() << '\n';
-					std::cout << "joystick amount: " << axis->x << ", " << axis->y << '\n';
-				}
-				
+				if (axis_right.GetMagnitude() > 0.1f) {
+					std::cout << axis_right.GetMagnitude() << '\n';
+					std::cout << "joystick amount: " << axis_right.x << ", " << axis_right.y << '\n';
+				}	
 			}
+
 		}
 		if (leftControllerIndex != vr::k_unTrackedDeviceIndexInvalid) {
-			vr::VRControllerState_t leftControllerState;
 
 			if (pSystem->GetControllerState(leftControllerIndex, &leftControllerState, sizeof(leftControllerState))) {
-				float triggerValue = leftControllerState.rAxis[1].x;
+				triggerValue_left = leftControllerState.rAxis[1].x;
+				axis_left.x = rightControllerState.rAxis->x;
+				axis_left.y = rightControllerState.rAxis->y;
+				
+				if (triggerValue_left > 0) {
+					std::cout << "trigger amount: " << triggerValue_left << std::endl;
+				}
+				if (axis_left.GetMagnitude() > 0.1f) {
+					std::cout << axis_left.GetMagnitude() << '\n';
+					std::cout << "joystick amount: " << axis_left.x << ", " << axis_left.y << '\n';
+				}
 			}
-
 		}
-		
 
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}
 
-	std::cout << "Hello World!\n";
+
+	return 1;
 }

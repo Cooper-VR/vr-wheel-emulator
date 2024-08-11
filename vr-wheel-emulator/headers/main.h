@@ -10,6 +10,7 @@
 #include <cmath>
 
 const double PI = 3.14159265358979323846;
+vr::TrackedDevicePose_t trackedDevicesPose[vr::k_unMaxTrackedDeviceCount];
 
 class Vector3 {
 public:
@@ -52,7 +53,6 @@ public:
 };
 
 Vector3 GetRotation(vr::IVRSystem *pSystem) {
-    vr::TrackedDevicePose_t trackedDevicesPose[vr::k_unMaxTrackedDeviceCount];
 
     pSystem->GetDeviceToAbsoluteTrackingPose(vr::TrackingUniverseStanding, 0, trackedDevicesPose, vr::k_unMaxTrackedDeviceCount);
 
@@ -79,9 +79,13 @@ Vector3 GetRotation(vr::IVRSystem *pSystem) {
         Rotation.x = yaw;
         Rotation.y = pitch;
         Rotation.z = roll;
+
+
         return Rotation;
     }
-    else return *(new Vector3());
+    else {
+        return *(new Vector3());
+    }
 }
 
 void PrintRotation(Vector3 rotation) {
@@ -97,3 +101,15 @@ void ConvertToDegrees(Vector3* Rotation) {
     Rotation->y *= (180 / (float)PI);
     Rotation->z *= (180 / (float)PI);
 }
+
+Vector3 rotation_right;
+Vector3 rotation_left;
+vr::TrackedDeviceIndex_t rightControllerIndex;
+vr::TrackedDeviceIndex_t leftControllerIndex;
+vr::VRControllerState_t state;
+vr::VRControllerState_t rightControllerState;
+vr::VRControllerState_t leftControllerState;
+float triggerValue_right;
+float triggerValue_left;
+Vector2 axis_left;
+Vector2 axis_right;
