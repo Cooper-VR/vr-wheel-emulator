@@ -7,6 +7,8 @@
 
 int main()
 {
+	bool shifted = false;
+
 	vr::EVRInitError eError = vr::VRInitError_None;
 	vr::IVRSystem* pSystem = vr::VR_Init(&eError, vr::VRApplication_Background);
 
@@ -39,14 +41,19 @@ int main()
 					std::cout << "trigger amount: " << triggerValue_right << std::endl;
 				}
 				if (axis_right.GetMagnitude() > 0.1f) {
-					std::cout << "joystick amount: " << axis_right.x << ", " << axis_right.y << '\n';
-					if (axis_right.y > gear_shift_sense) {
-						std::cout << "up-shift";
+					if (axis_right.y > gear_shift_sense && !shifted) {
+						std::cout << "up-shift\n";
+						shifted = true;
 					}
-					else if (axis_right.y < -gear_shift_sense) {
-						std::cout << "down-shift";
+					else if (axis_right.y < -gear_shift_sense && !shifted) {
+						std::cout << "down-shift\n";
+						shifted = true;
 					}
 				}
+				else {
+					shifted = false;
+				}
+
 				if (rightControllerState.ulButtonPressed & vr::ButtonMaskFromId(vr::k_EButton_ApplicationMenu)) {
 					std::cout << "b-button-right pressed\n";
 				}
@@ -72,13 +79,6 @@ int main()
 				if (axis_left.GetMagnitude() > mode_change_sense) {
 					//use tangent^-1 to find the angle
 
-					/*
-					* +-36 = clutch
-					* 36 - 108 = lights
-					* 108 - 180 = horn
-					* 180 - 252 = handbrake
-					* 252 - -36 = brake
-					*/
 					float angle = std::atan(axis_left.y / axis_left.x);
 					angle *= (180 / PI);
 
