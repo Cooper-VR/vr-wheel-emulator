@@ -10,6 +10,8 @@
 #include <cmath>
 
 const double PI = 3.14159265358979323846;
+const float gear_shift_sense = 0.25;
+const float mode_change_sense = 0.2;
 vr::TrackedDevicePose_t trackedDevicesPose[vr::k_unMaxTrackedDeviceCount];
 
 class Vector3 {

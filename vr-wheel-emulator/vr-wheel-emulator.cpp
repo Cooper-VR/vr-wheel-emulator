@@ -40,6 +40,12 @@ int main()
 				}
 				if (axis_right.GetMagnitude() > 0.1f) {
 					std::cout << "joystick amount: " << axis_right.x << ", " << axis_right.y << '\n';
+					if (axis_right.y > gear_shift_sense) {
+						std::cout << "up-shift";
+					}
+					else if (axis_right.y < -gear_shift_sense) {
+						std::cout << "down-shift"
+					}
 				}
 				if (rightControllerState.ulButtonPressed & vr::ButtonMaskFromId(vr::k_EButton_ApplicationMenu)) {
 					std::cout << "b-button-right pressed\n";
@@ -48,7 +54,7 @@ int main()
 					std::cout << "joystick Pressed in\n";
 				}
 				if (rightControllerState.ulButtonPressed & vr::ButtonMaskFromId(vr::k_EButton_Grip)) {
-					std::cout << "gripping\n";
+					std::cout << "gripping wheel\n";
 				}
 			}
 
@@ -63,7 +69,17 @@ int main()
 				if (triggerValue_left > 0) {
 					std::cout << "trigger amount: " << triggerValue_left << std::endl;
 				}
-				if (axis_left.GetMagnitude() > 0.1f) {
+				if (axis_left.GetMagnitude() > mode_change_sense) {
+					//use tangent^-1 to find the angle
+
+					/*
+					* +-36 = clutch
+					* 36 - 108 = lights
+					* 108 - 180 = horn
+					* 180 - 252 = handbrake
+					* 252 - -36 = brake
+					*/
+
 					std::cout << "joystick amount: " << axis_left.x << ", " << axis_left.y << '\n';
 				}
 				if (leftControllerState.ulButtonPressed & vr::ButtonMaskFromId(vr::k_EButton_ApplicationMenu)) {
