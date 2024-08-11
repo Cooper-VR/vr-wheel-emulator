@@ -102,6 +102,14 @@ void ConvertToDegrees(Vector3* Rotation) {
     Rotation->z *= (180 / (float)PI);
 }
 
+enum leftHandModes {
+    brake = 10,
+    handBrake = 11,
+    headlights = 12,
+    horn = 13,
+    clutch = 14
+};
+
 Vector3 rotation_right;
 Vector3 rotation_left;
 vr::TrackedDeviceIndex_t rightControllerIndex;
