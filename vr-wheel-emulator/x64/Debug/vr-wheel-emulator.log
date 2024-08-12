@@ -3,10 +3,10 @@
 E:\cooperBower\github\vr-wheel-emulator\vr-wheel-emulator\headers\main.h(14,33): warning C4305: 'initializing': truncation from 'double' to 'float'
   (compiling source file 'vr-wheel-emulator.cpp')
   
-E:\cooperBower\github\vr-wheel-emulator\vr-wheel-emulator\vr-wheel-emulator.cpp(191,44): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
-E:\cooperBower\github\vr-wheel-emulator\vr-wheel-emulator\vr-wheel-emulator.cpp(232,25): warning C4305: '*=': truncation from 'double' to 'float'
-E:\cooperBower\github\vr-wheel-emulator\vr-wheel-emulator\vr-wheel-emulator.cpp(283,43): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
-E:\cooperBower\github\vr-wheel-emulator\vr-wheel-emulator\vr-wheel-emulator.cpp(294,37): warning C4244: '-=': conversion from 'double' to 'float', possible loss of data
-E:\cooperBower\github\vr-wheel-emulator\vr-wheel-emulator\vr-wheel-emulator.cpp(297,37): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
-E:\cooperBower\github\vr-wheel-emulator\vr-wheel-emulator\vr-wheel-emulator.cpp(96,26): warning C4101: 'trackedDevicesPose': unreferenced local variable
+E:\cooperBower\github\vr-wheel-emulator\vr-wheel-emulator\vr-wheel-emulator.cpp(174,44): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+E:\cooperBower\github\vr-wheel-emulator\vr-wheel-emulator\vr-wheel-emulator.cpp(215,25): warning C4305: '*=': truncation from 'double' to 'float'
+E:\cooperBower\github\vr-wheel-emulator\vr-wheel-emulator\vr-wheel-emulator.cpp(266,43): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+E:\cooperBower\github\vr-wheel-emulator\vr-wheel-emulator\vr-wheel-emulator.cpp(277,37): warning C4244: '-=': conversion from 'double' to 'float', possible loss of data
+E:\cooperBower\github\vr-wheel-emulator\vr-wheel-emulator\vr-wheel-emulator.cpp(280,37): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+E:\cooperBower\github\vr-wheel-emulator\vr-wheel-emulator\vr-wheel-emulator.cpp(79,26): warning C4101: 'trackedDevicesPose': unreferenced local variable
   vr-wheel-emulator.vcxproj -> E:\cooperBower\github\vr-wheel-emulator\x64\Debug\vr-wheel-emulator.exe

@@ -132,6 +132,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\glad.c" />
+    <ClCompile Include="src\image.cpp" />
     <ClCompile Include="vr-wheel-emulator.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -140,6 +141,7 @@
     <ClInclude Include="headers\main.h" />
     <ClInclude Include="headers\openvr.h" />
     <ClInclude Include="headers\public.h" />
+    <ClInclude Include="headers\stb_image.h" />
     <ClInclude Include="headers\vjoyinterface.h" />
   </ItemGroup>
   <ItemGroup>
@@ -150,6 +152,9 @@
   <ItemGroup>
     <Library Include="lib\openvr_api.lib" />
     <Library Include="lib\vJoyInterface.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="1.PNG" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

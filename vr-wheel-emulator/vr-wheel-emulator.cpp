@@ -9,6 +9,8 @@
 #include "headers/glad.h"
 #include "GLFW/glfw3.h"
 
+char path[] = "E:/Capture1.PNG";
+
 void processInput(GLFWwindow* window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
@@ -16,48 +18,7 @@ void processInput(GLFWwindow* window) {
 }
 
 int main()
-{
-	if (!glfwInit()) {
-		std::cout << "Failed to initialize GLFW" << std::endl;
-		return -1;
-	}
-
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-	GLFWwindow* window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
-	if (window == NULL) {
-		std::cout << "Failed to create GLFW window" << std::endl;
-		glfwTerminate();
-		return -1;
-	}
-	glfwMakeContextCurrent(window);
-
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-		std::cout << "Failed to initialize GLAD" << std::endl;
-		return -1;
-	}
-
-	// Set the viewport size
-	glViewport(0, 0, 800, 600);
-
-	// Main loop
-	while (!glfwWindowShouldClose(window)) {
-		processInput(window);
-
-		//rendering here
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
-
-		glfwSwapBuffers(window);
-		glfwPollEvents();
-	}
-
-	// Terminate GLFW
-	glfwTerminate();
-	return 0;
-
+{	
 	bool shifted = false;
 	bool ungrippedLeft = true;
 	bool ungrippedRight = true;
@@ -66,13 +27,35 @@ int main()
 	bool turnedOn = false;
 
 	vr::EVRInitError eError = vr::VRInitError_None;
-	vr::IVRSystem* pSystem = vr::VR_Init(&eError, vr::VRApplication_Background);
+	vr::IVRSystem* pSystem = vr::VR_Init(&eError, vr::VRApplication_Overlay);
 
 	if (eError != vr::VRInitError_None) {
 		std::cout << "Failed to iniitalize, is SteamVR running\n";
 		return -1;
 	}
 	std::cout << "OpenVR initalized\n";
+
+	vr::IVROverlay *oOverlay = (vr::IVROverlay*)vr::VR_GetGenericInterface(vr::IVROverlay_Version, &eError);
+	if (eError != vr::VRInitError_None || !oOverlay) {
+		std::cerr << "Failed to get overlay interface\n";
+		vr::VR_Shutdown();
+		return -2;
+	}
+
+	vr::VROverlayHandle_t* handle = new vr::VROverlayHandle_t();
+	oOverlay->SetOverlayWidthInMeters(*handle, 1);
+	vr::VRTextureBounds_t bounds;
+	bounds.uMin = 1;
+	bounds.uMax = 0;
+	bounds.vMin = 0;
+	bounds.vMax = 1;
+	oOverlay->GetOverlayTextureBounds(*handle, &bounds);
+
+	oOverlay->SetOverlayFromFile(*handle, path);
+	vr::VROverlayHandle_t* iconHandle = new vr::VROverlayHandle_t;
+
+	oOverlay->CreateDashboardOverlay("com.cooper.vr-wheel-emulator", "vr-wheel-emulator", handle, iconHandle);
+	oOverlay->ShowOverlay(*handle);
 
 	if (!vJoyEnabled()) {
 		std::cerr << "vJoy driver not enabled: Failed to find vJoy device!" << std::endl;
@@ -110,7 +93,7 @@ int main()
 	UINT hornButton = 4;
 	while (1) {
 
-		
+		oOverlay->ShowOverlay(*handle);
 		//for vjoy
 		vJoyAxisX = static_cast<LONG>((wheelAngle / 90.0) * (16383 * 0.3)) + 16384;
 		vJoyAxisY = static_cast<LONG>(triggerValue_right * 32767);
