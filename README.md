@@ -11,7 +11,6 @@
 
 <h2>TODO</h2>
 - add light GUI for mode selection
-- differeciate trackpad vs joystick
 - changing grip sensitivty
 - headlights are a bit buggy
 
