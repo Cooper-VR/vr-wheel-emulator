@@ -14,6 +14,9 @@ int main()
 	bool ungrippedLeft = true;
 	bool ungrippedRight = true;
 
+	bool turnedOff = true;
+	bool turnedOn = false;
+
 	vr::EVRInitError eError = vr::VRInitError_None;
 	vr::IVRSystem* pSystem = vr::VR_Init(&eError, vr::VRApplication_Background);
 
@@ -57,10 +60,6 @@ int main()
 	UINT downShiftButton = 2;
 	UINT headlightButton = 3;
 	UINT hornButton = 4;
-
-	bool lights = false;
-	bool hornBool = false;
-
 	while (1) {
 
 		
@@ -85,22 +84,29 @@ int main()
 				vJoyAxisXY = 0;
 				break;
 			case headlights:
-				vJoyAxisZ = 0;
-				vJoyAxisXY = 0;
-				vJoyAxisXZ = 0;
+				
+				//vJoyAxisZ = 0;
+				//vJoyAxisXY = 0;
+				//vJoyAxisXZ = 0;
 
-				SetBtn(!lights, iInterface, headlightButton);
-				lights = !lights;
+				//SetBtn(true, iInterface, headlightButton);
+				//std::cout << "headlights are: " << true << '\n';
+				
 				break;
 			case horn:
+				/*
 				vJoyAxisZ = 0;
 				vJoyAxisXY = 0;
 				vJoyAxisXZ = 0;
-
-				SetBtn(!hornBool, iInterface, hornButton);
-				hornBool = !horn;
+				SetBtn(false, iInterface, headlightButton);
+				SetBtn(false, iInterface, hornButton);
+				hornBool = !horn;*/
 				break;
 			}
+		}
+		else {
+			//lightTurned = false;
+			//SetBtn(false, iInterface, headlightButton);
 		}
 
 
@@ -111,6 +117,8 @@ int main()
 		iReport.wAxisZ = vJoyAxisZ;
 		iReport.wAxisXRot = vJoyAxisXY;
 		iReport.wAxisYRot = vJoyAxisXZ;
+		//SetBtn(false, iInterface, headlightButton);
+
 
 		// Update the vJoy device
 		if (!UpdateVJD(iInterface, &iReport)) {
@@ -128,7 +136,7 @@ int main()
 
 		ConvertToDegrees(&angularVelocity_right);
 		ConvertToDegrees(&angularVelocity_left);
-		std::cout << wheelAngle << '\n';
+		//std::cout << wheelAngle << '\n';
 		
 		pSystem->GetControllerState(rightControllerIndex, &state, sizeof(state));
 
@@ -139,7 +147,7 @@ int main()
 
 				if (triggerValue_right > 0) {
 					std::cout << "trigger amount: " << triggerValue_right << std::endl;
-				}
+									}
 				if (axis_right.GetMagnitude() > 0.1f) {
 					if (axis_right.y > gear_shift_sense && !shifted) {
 						std::cout << "up-shift\n";
@@ -167,6 +175,10 @@ int main()
 					axis_right.y = rightControllerState.rAxis[0].y;
 
 				}
+				else {
+					axis_right.x = 0;
+					axis_right.y = 0;
+				}
 				if (rightControllerState.ulButtonPressed & vr::ButtonMaskFromId(vr::k_EButton_Grip)) {
 					std::cout << "gripping wheel\n";
 					ungrippedRight = false;
@@ -182,10 +194,23 @@ int main()
 
 			if (pSystem->GetControllerState(leftControllerIndex, &leftControllerState, sizeof(leftControllerState))) {
 				triggerValue_left = leftControllerState.rAxis[1].x;
+				//std::cout << "trigger amount: " << triggerValue_left << std::endl;
 
 				if (triggerValue_left > 0) {
-					std::cout << "trigger amount: " << triggerValue_left << std::endl;
+					if (currentMode == headlights && !turnedOn) {
+						SetBtn(false, iInterface, headlightButton);
+						std::cout << "headlights: on\n";
+						turnedOn = true;
+						turnedOff = false;
+					}
 				}
+				else if (!turnedOff){
+					std::cout << "headlights: off\n";
+					SetBtn(true, iInterface, headlightButton);
+					turnedOff = true;
+					turnedOn = false;
+				}
+
 				if (axis_left.GetMagnitude() > mode_change_sense) {
 
 					float angle = std::atan(axis_left.y / axis_left.x);
@@ -221,13 +246,21 @@ int main()
 					std::cout << angle << ":" << currentMode << '\n';
 				}
 				if (leftControllerState.ulButtonPressed & vr::ButtonMaskFromId(vr::k_EButton_ApplicationMenu)) {
+					//SetBtn(true, iInterface, headlightButton);
 					std::cout << "b-button-left pressed\n";
+				}
+				else {
+					//SetBtn(false, iInterface, headlightButton);
 				}
 				if (leftControllerState.ulButtonPressed & vr::ButtonMaskFromId(vr::k_EButton_Axis0)) {
 					std::cout << "joystick Pressed in\n";
 					axis_left.x = leftControllerState.rAxis->x;
 					axis_left.y = leftControllerState.rAxis->y;
 
+				}
+				else {
+					axis_left.x = 0;
+					axis_left.y = 0;
 				}
 				if (leftControllerState.ulButtonPressed & vr::ButtonMaskFromId(vr::k_EButton_Grip)) {
 					std::cout << "gripping\n";
@@ -253,7 +286,7 @@ int main()
 			wheelAngle = 0;
 		}
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		std::this_thread::sleep_for(std::chrono::milliseconds(20));
 	}
 
 
