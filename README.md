@@ -11,14 +11,17 @@
  - wheel turning
 
 <h2>TODO</h2>
- - add light GUI for mode selection
- - changing grip sensitivty
- - headlights are a bit buggy
+
+ - Add light GUI for mode selection
+ - Changing grip sensitivty
+ - Headlights are a bit buggy
 
 <h2>WINDOWS</h2>
+
 1. download winows branch of the project
 2. open in visual studio 2022, (openvr header and lib files are included)
 3. build.. thats it
 
 <h2>LINUX</h2>
+
 1. comming soon
