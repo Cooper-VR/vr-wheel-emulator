@@ -136,13 +136,16 @@
   <ItemGroup>
     <ClInclude Include="headers\main.h" />
     <ClInclude Include="headers\openvr.h" />
-    <ClInclude Include="headers\openvr_driver.h" />
+    <ClInclude Include="headers\public.h" />
+    <ClInclude Include="headers\vjoyinterface.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="dll\openvr_api.dll" />
+    <None Include="dll\vJoyInterface.dll" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="lib\openvr_api.lib" />
+    <Library Include="lib\vJoyInterface.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

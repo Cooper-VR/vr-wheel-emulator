@@ -1,12 +1,13 @@
 #pragma once
 
 #include <iostream>
-#define GLM_ENABLE_EXPERIMENTAL
-
 #include "openvr.h"
 #include <cmath>
 #include <chrono>
 #include <thread>
+#include <Windows.h>
+#include "headers/public.h"
+#include "headers/vjoyinterface.h"
 
 const double PI = 3.14159265358979323846;
 const float gear_shift_sense = 0.25;
@@ -15,6 +16,8 @@ double deltaTime = 0.0;
 float wheelAngle = 0;
 const float wheelReboundSpeed = 100;
 vr::TrackedDevicePose_t trackedDevicesPose[vr::k_unMaxTrackedDeviceCount];
+float triggerValue_right;
+float triggerValue_left;
 
 /// <summary>
 /// an easier way to store three values like x, y, z
@@ -114,6 +117,25 @@ enum leftHandModes {
     none = 9
 };
 
+void sendSteeringAngleToVJoy() {
+    UINT iInterface = 1; // vJoy device ID
+
+    // Normalize the angle to vJoy X-axis range (-32767 to 32767)
+    // Assuming angle ranges from -90 to 90 degrees
+    LONG vJoyAxisX = static_cast<LONG>((wheelAngle / 90.0) * (16383 * 0.3)) + 16384;
+    LONG vJoyAxisY = static_cast<LONG>(triggerValue_right * 32767);
+
+    JOYSTICK_POSITION_V2 iReport;
+    iReport.bDevice = iInterface;
+    iReport.wAxisX = vJoyAxisX; // Set the X-axis to the normalized value
+    iReport.wAxisY = vJoyAxisY;
+
+    // Update the vJoy device
+    if (!UpdateVJD(iInterface, &iReport)) {
+        std::cerr << "Failed to update vJoy device.\n";
+    }
+}
+
 leftHandModes currentMode = none;
 Vector3 angularVelocity_left;
 Vector3 angularVelocity_right;
@@ -122,7 +144,5 @@ vr::TrackedDeviceIndex_t leftControllerIndex;
 vr::VRControllerState_t state;
 vr::VRControllerState_t rightControllerState;
 vr::VRControllerState_t leftControllerState;
-float triggerValue_right;
-float triggerValue_left;
 Vector2 axis_left;
 Vector2 axis_right;

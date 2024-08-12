@@ -3,6 +3,9 @@
 #include "headers/main.h"
 #include <chrono>
 #include <thread>
+#include <Windows.h>
+#include "headers/public.h"
+#include "headers/vjoyinterface.h"
 
 
 int main()
@@ -20,14 +23,101 @@ int main()
 	}
 	std::cout << "OpenVR initalized\n";
 
-	
+	if (!vJoyEnabled()) {
+		std::cerr << "vJoy driver not enabled: Failed to find vJoy device!" << std::endl;
+		return -2;
+	}
+	std::cout << "vjoy enabled";
+
+	UINT iInterface = 1; // First vJoy device
+
+	VjdStat status = GetVJDStatus(iInterface);
+	if (status != VJD_STAT_FREE && status != VJD_STAT_OWN) {
+		std::cerr << "vJoy device " << iInterface << " not available.\n";
+		return -1;
+	}
+	if (!AcquireVJD(iInterface)) {
+		std::cerr << "Failed to acquire vJoy device " << iInterface << ".\n";
+		return -1;
+	}
+	std::cout << "vjoy all setup";
+
 	vr::TrackedDevicePose_t trackedDevicesPose[vr::k_unMaxTrackedDeviceCount];
 	rightControllerIndex = pSystem->GetTrackedDeviceIndexForControllerRole(vr::TrackedControllerRole_RightHand);
 	leftControllerIndex = pSystem->GetTrackedDeviceIndexForControllerRole(vr::TrackedControllerRole_LeftHand);
 	auto lastTime = std::chrono::high_resolution_clock::now();
 
+	LONG vJoyAxisX;
+	LONG vJoyAxisY;
+	LONG vJoyAxisZ = 0;
+	LONG vJoyAxisXY = 0;
+	LONG vJoyAxisXZ = 0;
+
+	UINT upShiftButton = 1;
+	UINT downShiftButton = 2;
+	UINT headlightButton = 3;
+	UINT hornButton = 4;
+
+	bool lights = false;
+	bool hornBool = false;
+
 	while (1) {
-		//for deltatime
+
+		
+		//for vjoy
+		vJoyAxisX = static_cast<LONG>((wheelAngle / 90.0) * (16383 * 0.3)) + 16384;
+		vJoyAxisY = static_cast<LONG>(triggerValue_right * 32767);
+		if (triggerValue_left > 0) {
+			switch (currentMode) {
+			case brake:
+				vJoyAxisZ = static_cast<LONG>(triggerValue_left * 32767);
+				vJoyAxisXY = 0;
+				vJoyAxisXZ = 0;
+				break;
+			case handBrake:
+				vJoyAxisXY = static_cast<LONG>(triggerValue_left * 32767);
+				vJoyAxisZ = 0;
+				vJoyAxisXZ = 0;
+				break;
+			case clutch:
+				vJoyAxisXZ = static_cast<LONG>(triggerValue_left * 32767);
+				vJoyAxisZ = 0;
+				vJoyAxisXY = 0;
+				break;
+			case headlights:
+				vJoyAxisZ = 0;
+				vJoyAxisXY = 0;
+				vJoyAxisXZ = 0;
+
+				SetBtn(!lights, iInterface, headlightButton);
+				lights = !lights;
+				break;
+			case horn:
+				vJoyAxisZ = 0;
+				vJoyAxisXY = 0;
+				vJoyAxisXZ = 0;
+
+				SetBtn(!hornBool, iInterface, hornButton);
+				hornBool = !horn;
+				break;
+			}
+		}
+
+
+		JOYSTICK_POSITION_V2 iReport;
+		iReport.bDevice = iInterface;
+		iReport.wAxisX = vJoyAxisX; // Set the X-axis to the normalized value
+		iReport.wAxisY = vJoyAxisY;
+		iReport.wAxisZ = vJoyAxisZ;
+		iReport.wAxisXRot = vJoyAxisXY;
+		iReport.wAxisYRot = vJoyAxisXZ;
+
+		// Update the vJoy device
+		if (!UpdateVJD(iInterface, &iReport)) {
+			std::cerr << "Failed to update vJoy device.\n";
+		}
+
+		//for deltaTime
         auto currentTime = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> elapsed = currentTime - lastTime;
         deltaTime = elapsed.count();
@@ -55,14 +145,18 @@ int main()
 				if (axis_right.GetMagnitude() > 0.1f) {
 					if (axis_right.y > gear_shift_sense && !shifted) {
 						std::cout << "up-shift\n";
+						SetBtn(true, iInterface, upShiftButton);
 						shifted = true;
 					}
 					else if (axis_right.y < -gear_shift_sense && !shifted) {
 						std::cout << "down-shift\n";
+						SetBtn(true, iInterface, downShiftButton);
 						shifted = true;
 					}
 				}
 				else {
+					SetBtn(false, iInterface, upShiftButton);
+					SetBtn(false, iInterface, downShiftButton);
 					shifted = false;
 				}
 
@@ -108,7 +202,7 @@ int main()
 						angle += 360;
 					}	
 
-					if (angle < 36 && angle > 360 - 36) {
+					if (angle < 36 || angle > 360 - 36) {
 						currentMode = clutch;
 					}
 					else if (angle >= 36 && angle < 108) {
