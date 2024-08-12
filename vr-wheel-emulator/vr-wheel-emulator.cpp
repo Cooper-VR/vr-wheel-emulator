@@ -8,6 +8,8 @@
 int main()
 {
 	bool shifted = false;
+	bool ungrippedLeft = true;
+	bool ungrippedRight = true;
 
 	vr::EVRInitError eError = vr::VRInitError_None;
 	vr::IVRSystem* pSystem = vr::VR_Init(&eError, vr::VRApplication_Background);
@@ -22,11 +24,20 @@ int main()
 	vr::TrackedDevicePose_t trackedDevicesPose[vr::k_unMaxTrackedDeviceCount];
 	rightControllerIndex = pSystem->GetTrackedDeviceIndexForControllerRole(vr::TrackedControllerRole_RightHand);
 	leftControllerIndex = pSystem->GetTrackedDeviceIndexForControllerRole(vr::TrackedControllerRole_LeftHand);
+	auto lastTime = std::chrono::high_resolution_clock::now();
 
 	while (1) {
-		rotation_right = GetRotation(pSystem);
-		rotation_left = GetRotation(pSystem);
+        auto currentTime = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> elapsed = currentTime - lastTime;
+        deltaTime = elapsed.count();
+        lastTime = currentTime;
 
+		angularVelocity_left = getAngularVelocity(pSystem, leftControllerIndex);
+		angularVelocity_right = getAngularVelocity(pSystem, rightControllerIndex);
+
+		ConvertToDegrees(&angularVelocity_right);
+		ConvertToDegrees(&angularVelocity_left);
+		std::cout << wheelAngle << '\n';
 		
 		pSystem->GetControllerState(rightControllerIndex, &state, sizeof(state));
 		
@@ -62,6 +73,11 @@ int main()
 				}
 				if (rightControllerState.ulButtonPressed & vr::ButtonMaskFromId(vr::k_EButton_Grip)) {
 					std::cout << "gripping wheel\n";
+					ungrippedRight = false;
+					wheelAngle += angularVelocity_right.z * deltaTime;
+				}
+				else {
+					ungrippedRight = true;
 				}
 			}
 
@@ -72,12 +88,11 @@ int main()
 				triggerValue_left = leftControllerState.rAxis[1].x;
 				axis_left.x = leftControllerState.rAxis->x;
 				axis_left.y = leftControllerState.rAxis->y;
-				
+
 				if (triggerValue_left > 0) {
 					std::cout << "trigger amount: " << triggerValue_left << std::endl;
 				}
 				if (axis_left.GetMagnitude() > mode_change_sense) {
-					//use tangent^-1 to find the angle
 
 					float angle = std::atan(axis_left.y / axis_left.x);
 					angle *= (180 / PI);
@@ -119,12 +134,26 @@ int main()
 				}
 				if (leftControllerState.ulButtonPressed & vr::ButtonMaskFromId(vr::k_EButton_Grip)) {
 					std::cout << "gripping\n";
+					ungrippedLeft = false;
+					wheelAngle += angularVelocity_left.z * deltaTime;
 				}
-
-
+				else {
+					ungrippedLeft = true;
+				}
 			}
 		}
 
+		if (ungrippedLeft && ungrippedRight && (wheelAngle < -0.8 || wheelAngle > 0.8)) {
+			if (wheelAngle > 0) {
+				wheelAngle -= wheelReboundSpeed * deltaTime;
+			}
+			else if (wheelAngle < 0) {
+				wheelAngle += wheelReboundSpeed * deltaTime;
+			}
+		}
+		else if (ungrippedLeft && ungrippedRight) {
+			wheelAngle = 0;
+		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}
 
