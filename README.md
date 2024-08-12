@@ -19,4 +19,4 @@ todo:
 
 to build current version:
 1. open in visual studio 2022, (openvr header and lib files are included)
-2. build (maybe need some nuget packages, idk how that works)
+2. build.. thats it
