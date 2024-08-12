@@ -131,13 +131,11 @@ int main()
 		std::cout << wheelAngle << '\n';
 		
 		pSystem->GetControllerState(rightControllerIndex, &state, sizeof(state));
-		
+
 		if (rightControllerIndex != vr::k_unTrackedDeviceIndexInvalid) {
 			
 			if (pSystem->GetControllerState(rightControllerIndex, &rightControllerState, sizeof(rightControllerState))) {
 				triggerValue_right = rightControllerState.rAxis[1].x;
-				axis_right.x = rightControllerState.rAxis->x;
-				axis_right.y = rightControllerState.rAxis->y;
 
 				if (triggerValue_right > 0) {
 					std::cout << "trigger amount: " << triggerValue_right << std::endl;
@@ -164,7 +162,10 @@ int main()
 					std::cout << "b-button-right pressed\n";
 				}
 				if (rightControllerState.ulButtonPressed & vr::ButtonMaskFromId(vr::k_EButton_Axis0)) {
-					//std::cout << "joystick Pressed in\n";
+					std::cout << "joystick Pressed in\n";
+					axis_right.x = rightControllerState.rAxis[0].x;
+					axis_right.y = rightControllerState.rAxis[0].y;
+
 				}
 				if (rightControllerState.ulButtonPressed & vr::ButtonMaskFromId(vr::k_EButton_Grip)) {
 					std::cout << "gripping wheel\n";
@@ -181,8 +182,6 @@ int main()
 
 			if (pSystem->GetControllerState(leftControllerIndex, &leftControllerState, sizeof(leftControllerState))) {
 				triggerValue_left = leftControllerState.rAxis[1].x;
-				axis_left.x = leftControllerState.rAxis->x;
-				axis_left.y = leftControllerState.rAxis->y;
 
 				if (triggerValue_left > 0) {
 					std::cout << "trigger amount: " << triggerValue_left << std::endl;
@@ -225,7 +224,10 @@ int main()
 					std::cout << "b-button-left pressed\n";
 				}
 				if (leftControllerState.ulButtonPressed & vr::ButtonMaskFromId(vr::k_EButton_Axis0)) {
-					//std::cout << "joystick Pressed in\n";
+					std::cout << "joystick Pressed in\n";
+					axis_left.x = leftControllerState.rAxis->x;
+					axis_left.y = leftControllerState.rAxis->y;
+
 				}
 				if (leftControllerState.ulButtonPressed & vr::ButtonMaskFromId(vr::k_EButton_Grip)) {
 					std::cout << "gripping\n";
