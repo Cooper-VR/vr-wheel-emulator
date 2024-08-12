@@ -27,6 +27,7 @@ int main()
 	auto lastTime = std::chrono::high_resolution_clock::now();
 
 	while (1) {
+		//for deltatime
         auto currentTime = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> elapsed = currentTime - lastTime;
         deltaTime = elapsed.count();
@@ -143,6 +144,7 @@ int main()
 			}
 		}
 
+		//handles when wheel is let go
 		if (ungrippedLeft && ungrippedRight && (wheelAngle < -0.8 || wheelAngle > 0.8)) {
 			if (wheelAngle > 0) {
 				wheelAngle -= wheelReboundSpeed * deltaTime;
@@ -154,6 +156,7 @@ int main()
 		else if (ungrippedLeft && ungrippedRight) {
 			wheelAngle = 0;
 		}
+
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}
 
