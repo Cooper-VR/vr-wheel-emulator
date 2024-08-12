@@ -15,6 +15,7 @@ todo:
  - get grip sensitivity
  - hook it up to a virtual input
  - get a GUI for left-hand modes
+ - might make a linux version
 
 to build current version:
 1. open in visual studio 2022, (openvr header and lib files are included)
