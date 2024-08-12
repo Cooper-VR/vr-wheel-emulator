@@ -75,7 +75,7 @@ int main()
 		iReport.wAxisZ = vJoyAxisZ;
 		iReport.wAxisXRot = vJoyAxisXY;
 		iReport.wAxisYRot = vJoyAxisXZ;
-		//SetBtn(false, iInterface, headlightButton);
+		
 
 
 		// Update the vJoy device
