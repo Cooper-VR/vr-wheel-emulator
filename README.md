@@ -9,12 +9,12 @@
  - clutch
  - break/handbrake
  - wheel turning
+ - headlights, might be buggy, idk
 
 <h2>TODO</h2>
 
  - Add light GUI for mode selection
  - Changing grip sensitivty
- - Headlights are a bit buggy
 
 <h2>WINDOWS</h2>
 
