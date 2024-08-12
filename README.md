@@ -1,22 +1,24 @@
-vr wheel emulator to play racing games and virtually hold a wheel.
+<h1>vr wheel emulator to play racing games and virtually hold a wheel.</h1>
 
 - project is inspired by this repo: https://github.com/mdovgialo/steam-vr-wheel
 - function and input layout based on VRChat worlds made by https://vrchat.com/home/user/usr_98c855c2-1267-454d-acd5-6623e36ba5ef
 
-**WIP**
+<h2>FEATURES</h2>
+- wheel turning
+- headlights
+- clutch
+- break/handbrake
 
-currently have:
- - rotation
- - trigger & axis input
- - wheel rotation
- - axis can change mode and gear-shift
+<h2>TODO</h2>
+- add light GUI for mode selection
+- differeciate trackpad vs joystick
+- changing grip sensitivty
+- headlights are a bit buggy
 
-todo:
- - get grip sensitivity
- - hook it up to a virtual input
- - get a GUI for left-hand modes
- - might make a linux version
+<h2>WINDOWS</h2>
+1. download winows branch of the project
+2. open in visual studio 2022, (openvr header and lib files are included)
+3. build.. thats it
 
-to build current version:
-1. open in visual studio 2022, (openvr header and lib files are included)
-2. build.. thats it
+<h2>LINUX</h2>
+1. comming soon
