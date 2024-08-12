@@ -8,6 +8,8 @@ vr wheel emulator to play racing games and virtually hold a wheel.
 currently have:
  - rotation
  - trigger & axis input
+ - wheel rotation
+ - axis can change mode and gear-shift
 
 todo:
  - get grip sensitivity
