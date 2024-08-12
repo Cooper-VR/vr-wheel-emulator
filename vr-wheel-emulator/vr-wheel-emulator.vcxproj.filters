@@ -18,6 +18,9 @@
     <ClCompile Include="vr-wheel-emulator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\glad.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\openvr.h">
@@ -32,10 +35,17 @@
     <ClInclude Include="headers\vjoyinterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="headers\glad.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\khrplatform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="dll\openvr_api.dll" />
     <None Include="dll\vJoyInterface.dll" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="lib\openvr_api.lib" />

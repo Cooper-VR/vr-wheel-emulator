@@ -6,10 +6,58 @@
 #include <Windows.h>
 #include "headers/public.h"
 #include "headers/vjoyinterface.h"
+#include "headers/glad.h"
+#include "GLFW/glfw3.h"
 
+void processInput(GLFWwindow* window) {
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+		glfwSetWindowShouldClose(window, true);
+	}
+}
 
 int main()
 {
+	if (!glfwInit()) {
+		std::cout << "Failed to initialize GLFW" << std::endl;
+		return -1;
+	}
+
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+	GLFWwindow* window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
+	if (window == NULL) {
+		std::cout << "Failed to create GLFW window" << std::endl;
+		glfwTerminate();
+		return -1;
+	}
+	glfwMakeContextCurrent(window);
+
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+		std::cout << "Failed to initialize GLAD" << std::endl;
+		return -1;
+	}
+
+	// Set the viewport size
+	glViewport(0, 0, 800, 600);
+
+	// Main loop
+	while (!glfwWindowShouldClose(window)) {
+		processInput(window);
+
+		//rendering here
+		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+
+		glfwSwapBuffers(window);
+		glfwPollEvents();
+	}
+
+	// Terminate GLFW
+	glfwTerminate();
+	return 0;
+
 	bool shifted = false;
 	bool ungrippedLeft = true;
 	bool ungrippedRight = true;
@@ -155,6 +203,7 @@ int main()
 				//std::cout << "trigger amount: " << triggerValue_left << std::endl;
 
 				if (triggerValue_left > 0) {
+
 					if (currentMode == headlights && !turnedOn) {
 						SetBtn(false, iInterface, headlightButton);
 						std::cout << "headlights: on\n";
@@ -167,6 +216,14 @@ int main()
 					SetBtn(true, iInterface, headlightButton);
 					turnedOff = true;
 					turnedOn = false;
+				}
+				if (triggerValue_left > 0.8) {
+					SetBtn(true, iInterface, hornButton);
+
+				}
+				else {
+					SetBtn(false, iInterface, hornButton);
+
 				}
 
 				if (axis_left.GetMagnitude() > mode_change_sense) {
@@ -245,7 +302,6 @@ int main()
 		}
 
 
-
 		if (triggerValue_left > 0) {
 			switch (currentMode) {
 			case brake:
@@ -265,7 +321,7 @@ int main()
 				break;
 			}
 		}
-		std::this_thread::sleep_for(std::chrono::milliseconds(12));
+		std::this_thread::sleep_for(std::chrono::milliseconds(20));
 	}
 
 

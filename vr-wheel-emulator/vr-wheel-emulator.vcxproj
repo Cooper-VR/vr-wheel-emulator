@@ -131,9 +131,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\glad.c" />
     <ClCompile Include="vr-wheel-emulator.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="headers\glad.h" />
+    <ClInclude Include="headers\khrplatform.h" />
     <ClInclude Include="headers\main.h" />
     <ClInclude Include="headers\openvr.h" />
     <ClInclude Include="headers\public.h" />
@@ -142,11 +145,20 @@
   <ItemGroup>
     <None Include="dll\openvr_api.dll" />
     <None Include="dll\vJoyInterface.dll" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="lib\openvr_api.lib" />
     <Library Include="lib\vJoyInterface.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\glfw.3.4.0\build\native\glfw.targets" Condition="Exists('..\packages\glfw.3.4.0\build\native\glfw.targets')" />
+  </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\glfw.3.4.0\build\native\glfw.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\glfw.3.4.0\build\native\glfw.targets'))" />
+  </Target>
 </Project>
