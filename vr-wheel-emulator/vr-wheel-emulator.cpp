@@ -66,49 +66,7 @@ int main()
 		//for vjoy
 		vJoyAxisX = static_cast<LONG>((wheelAngle / 90.0) * (16383 * 0.3)) + 16384;
 		vJoyAxisY = static_cast<LONG>(triggerValue_right * 32767);
-		if (triggerValue_left > 0) {
-			switch (currentMode) {
-			case brake:
-				vJoyAxisZ = static_cast<LONG>(triggerValue_left * 32767);
-				vJoyAxisXY = 0;
-				vJoyAxisXZ = 0;
-				break;
-			case handBrake:
-				vJoyAxisXY = static_cast<LONG>(triggerValue_left * 32767);
-				vJoyAxisZ = 0;
-				vJoyAxisXZ = 0;
-				break;
-			case clutch:
-				vJoyAxisXZ = static_cast<LONG>(triggerValue_left * 32767);
-				vJoyAxisZ = 0;
-				vJoyAxisXY = 0;
-				break;
-			case headlights:
-				
-				//vJoyAxisZ = 0;
-				//vJoyAxisXY = 0;
-				//vJoyAxisXZ = 0;
-
-				//SetBtn(true, iInterface, headlightButton);
-				//std::cout << "headlights are: " << true << '\n';
-				
-				break;
-			case horn:
-				/*
-				vJoyAxisZ = 0;
-				vJoyAxisXY = 0;
-				vJoyAxisXZ = 0;
-				SetBtn(false, iInterface, headlightButton);
-				SetBtn(false, iInterface, hornButton);
-				hornBool = !horn;*/
-				break;
-			}
-		}
-		else {
-			//lightTurned = false;
-			//SetBtn(false, iInterface, headlightButton);
-		}
-
+			
 
 		JOYSTICK_POSITION_V2 iReport;
 		iReport.bDevice = iInterface;
@@ -126,10 +84,10 @@ int main()
 		}
 
 		//for deltaTime
-        auto currentTime = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<double> elapsed = currentTime - lastTime;
-        deltaTime = elapsed.count();
-        lastTime = currentTime;
+		auto currentTime = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<double> elapsed = currentTime - lastTime;
+		deltaTime = elapsed.count();
+		lastTime = currentTime;
 
 		angularVelocity_left = getAngularVelocity(pSystem, leftControllerIndex);
 		angularVelocity_right = getAngularVelocity(pSystem, rightControllerIndex);
@@ -286,7 +244,28 @@ int main()
 			wheelAngle = 0;
 		}
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(20));
+
+
+		if (triggerValue_left > 0) {
+			switch (currentMode) {
+			case brake:
+				vJoyAxisZ = static_cast<LONG>(triggerValue_left * 32767);
+				vJoyAxisXY = 0;
+				vJoyAxisXZ = 0;
+				break;
+			case handBrake:
+				vJoyAxisXY = static_cast<LONG>(triggerValue_left * 32767);
+				vJoyAxisZ = 0;
+				vJoyAxisXZ = 0;
+				break;
+			case clutch:
+				vJoyAxisXZ = static_cast<LONG>(triggerValue_left * 32767);
+				vJoyAxisZ = 0;
+				vJoyAxisXY = 0;
+				break;
+			}
+		}
+		std::this_thread::sleep_for(std::chrono::milliseconds(12));
 	}
 
 
