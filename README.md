@@ -19,7 +19,7 @@
 
 1. download winows branch of the project
 2. open in visual studio 2022, (openvr header and lib files are included)
-3. set up base link for images, watch <a>https://youtu.be/wLXZP1mrt2M</a><p> to see how</p>
+3. set up base link for images, watch https://youtu.be/wLXZP1mrt2M to see how
 4. build.. thats it
 
 <h2>LINUX</h2>
