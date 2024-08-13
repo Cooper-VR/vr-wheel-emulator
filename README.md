@@ -13,6 +13,9 @@
  - change grip sensitivty in steamvr if using knuckles, makes grip settings default
  - overlay attached to HMD to see the left-hand modes like brake vs clutch vs lights vs handbrake
 
+<h2>DEMO</h2>
+https://www.youtube.com/watch?v=A1j3Tc6sNo0
+needs updating
 <h2>WINDOWS</h2>
 
 1. download winows branch of the project
