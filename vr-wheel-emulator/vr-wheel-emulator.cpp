@@ -9,7 +9,15 @@
 #include "headers/glad.h"
 #include "GLFW/glfw3.h"
 
-char path[] = "";
+char path[] = "E:/cooperBower/github/vr-wheel-emulator/vr-wheel-emulator/";
+char basePath[] = "images/base.png";
+char brakePath[] = "images/brake.png";
+char handbrakePath[] = "images/handbrake.png";
+char unusedPath[] = "images/unused.png";
+char lightPath[] = "images/lights.png";
+char clutchPath[] = "images/clutch.png";
+char currentPath[512];
+
 
 void processInput(GLFWwindow* window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
@@ -19,6 +27,13 @@ void processInput(GLFWwindow* window) {
 
 int main()
 {	
+	bool brakeSet = false;
+	bool handbrakeSet = false;
+	bool clutchSet = false;
+	bool lightsSet = false;
+	bool unusedSet = false;
+
+
 	bool shifted = false;
 	bool ungrippedLeft = true;
 	bool ungrippedRight = true;
@@ -43,15 +58,15 @@ int main()
 	}
 
 	vr::VROverlayHandle_t handle;
-	vr::VROverlayHandle_t iconHandle;
+	//vr::VROverlayHandle_t iconHandle;
 
 	const char* overlayKey = "com.cooper.vr-wheel-emulator";
 	const char* overlayName = "vr-wheel-emulator";
-	oOverlay->CreateDashboardOverlay(overlayKey, overlayName, &handle, &iconHandle);
+	oOverlay->CreateOverlay(overlayKey, overlayName, &handle);
 
 	oOverlay->SetOverlayColor(handle, 1, 1, 1);
 	oOverlay->SetOverlayAlpha(handle, 1);
-	oOverlay->SetOverlayWidthInMeters(handle, 1.0f);
+	oOverlay->SetOverlayWidthInMeters(handle, 0.1f);
 	vr::VRTextureBounds_t bounds;
 	bounds.uMin = 1;
 	bounds.uMax = 0;
@@ -59,13 +74,13 @@ int main()
 	bounds.vMax = 1;
 
 	oOverlay->SetOverlayTextureBounds(handle, &bounds);
-	oOverlay->SetOverlayFromFile(handle, path);
+	oOverlay->SetOverlayFromFile(handle, basePath);
 
 	if (!vJoyEnabled()) {
 		std::cerr << "vJoy driver not enabled: Failed to find vJoy device!" << std::endl;
 		return -2;
 	}
-	std::cout << "vjoy enabled";
+	std::cout << "vjoy enabled\n";
 
 	UINT iInterface = 1; // First vJoy device
 
@@ -78,7 +93,7 @@ int main()
 		std::cerr << "Failed to acquire vJoy device " << iInterface << ".\n";
 		return -1;
 	}
-	std::cout << "vjoy all setup";
+	std::cout << "vjoy all setup\n";
 
 	vr::TrackedDevicePose_t trackedDevicesPose[vr::k_unMaxTrackedDeviceCount];
 	rightControllerIndex = pSystem->GetTrackedDeviceIndexForControllerRole(vr::TrackedControllerRole_RightHand);
@@ -96,8 +111,21 @@ int main()
 	UINT headlightButton = 3;
 	UINT hornButton = 4;
 
+	vr::HmdMatrix34_t transform;
+
+	sprintf_s(currentPath, "%s%s", path, basePath);
+	oOverlay->SetOverlayFromFile(handle, currentPath);
+
 	while (1) {
 
+		std::cout << currentPath << '\n';
+
+		transform.m[0][0] = 1.0f;  transform.m[0][1] = 0.0f;  transform.m[0][2] = 1.0f;  transform.m[0][3] = -0.2f;
+		transform.m[1][0] = 0.0f;  transform.m[1][1] = 1.0f;  transform.m[1][2] = 0.0f;  transform.m[1][3] = -0.1f;
+		transform.m[2][0] = 0.0f;  transform.m[2][1] = 0.0f;  transform.m[2][2] = 1.0f;  transform.m[2][3] = -0.7f; // 0.5 meters in front
+
+
+		oOverlay->SetOverlayTransformTrackedDeviceRelative(handle, vr::k_unTrackedDeviceIndex_Hmd, &transform);
 		oOverlay->ShowOverlay(handle);
 		//for vjoy
 		vJoyAxisX = static_cast<LONG>((-wheelAngle / 90.0) * (16383 * 0.3)) + 16384;
@@ -130,7 +158,6 @@ int main()
 
 		ConvertToDegrees(&angularVelocity_right);
 		ConvertToDegrees(&angularVelocity_left);
-		//std::cout << wheelAngle << '\n';
 		
 		pSystem->GetControllerState(rightControllerIndex, &state, sizeof(state));
 
@@ -229,20 +256,63 @@ int main()
 						angle += 360;
 					}	
 
-					if (angle < 36 || angle > 360 - 36) {
+					if ((angle < 36 || angle > 360 - 36) && !clutchSet) {
+						clutchSet = true;
+						lightsSet = false;
+						unusedSet = false;
+						handbrakeSet = false;
+						brakeSet = false;
 						currentMode = clutch;
+						sprintf_s(currentPath,  "%s%s", path, clutchPath);
+						oOverlay->SetOverlayFromFile(handle, currentPath);
 					}
-					else if (angle >= 36 && angle < 108) {
+					else if ((angle >= 36 && angle < 108) && !lightsSet) {
 						currentMode = headlights;
+						clutchSet = false;
+						lightsSet = true;
+						unusedSet = false;
+						handbrakeSet = false;
+						brakeSet = false;
+						sprintf_s(currentPath, "%s%s", path, lightPath);
+
+						oOverlay->SetOverlayFromFile(handle, currentPath);
+
 					}
-					else if (angle >= 108 && angle < 180) {
+					else if ((angle >= 108 && angle < 180) && !unusedSet) {
 						currentMode = horn;
+						clutchSet = false;
+						lightsSet = false;
+						unusedSet = true;
+						handbrakeSet = false;
+						brakeSet = false;
+						sprintf_s(currentPath, "%s%s", path, unusedPath);
+
+						oOverlay->SetOverlayFromFile(handle, currentPath);
+
 					}
-					else if (angle >= 180 && angle < 252) {
+					else if ((angle >= 180 && angle < 252) && !handbrakeSet) {
 						currentMode = handBrake;
+						clutchSet = false;
+						lightsSet = false;
+						unusedSet = false;
+						handbrakeSet = true;
+						brakeSet = false;
+						sprintf_s(currentPath, "%s%s", path, handbrakePath);
+
+						oOverlay->SetOverlayFromFile(handle, currentPath);
+
 					}
-					else {
+					else if ((angle >= 252 && angle < 360 - 36) && !brakeSet){
+						clutchSet = false;
+						lightsSet = false;
+						unusedSet = false;
+						handbrakeSet = false;
+						brakeSet = true;
+						sprintf_s(currentPath, "%s%s", path, brakePath);
+
+						oOverlay->SetOverlayFromFile(handle, currentPath);
 						currentMode = brake;
+
 					}
 
 					
