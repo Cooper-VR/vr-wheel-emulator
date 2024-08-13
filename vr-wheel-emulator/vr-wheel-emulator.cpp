@@ -117,9 +117,6 @@ int main()
 	oOverlay->SetOverlayFromFile(handle, currentPath);
 
 	while (1) {
-
-		std::cout << currentPath << '\n';
-
 		transform.m[0][0] = 1.0f;  transform.m[0][1] = 0.0f;  transform.m[0][2] = 1.0f;  transform.m[0][3] = -0.2f;
 		transform.m[1][0] = 0.0f;  transform.m[1][1] = 1.0f;  transform.m[1][2] = 0.0f;  transform.m[1][3] = -0.1f;
 		transform.m[2][0] = 0.0f;  transform.m[2][1] = 0.0f;  transform.m[2][2] = 1.0f;  transform.m[2][3] = -0.7f; // 0.5 meters in front
@@ -166,9 +163,6 @@ int main()
 			if (pSystem->GetControllerState(rightControllerIndex, &rightControllerState, sizeof(rightControllerState))) {
 				triggerValue_right = rightControllerState.rAxis[1].x;
 
-				if (triggerValue_right > 0) {
-					std::cout << "trigger amount: " << triggerValue_right << std::endl;
-									}
 				if (axis_right.GetMagnitude() > 0.1f) {
 					if (axis_right.y > gear_shift_sense && !shifted) {
 						std::cout << "up-shift\n";
@@ -187,11 +181,7 @@ int main()
 					shifted = false;
 				}
 
-				if (rightControllerState.ulButtonPressed & vr::ButtonMaskFromId(vr::k_EButton_ApplicationMenu)) {
-					std::cout << "b-button-right pressed\n";
-				}
 				if (rightControllerState.ulButtonPressed & vr::ButtonMaskFromId(vr::k_EButton_Axis0)) {
-					std::cout << "joystick Pressed in\n";
 					axis_right.x = rightControllerState.rAxis[0].x;
 					axis_right.y = rightControllerState.rAxis[0].y;
 
@@ -326,7 +316,6 @@ int main()
 					//SetBtn(false, iInterface, headlightButton);
 				}
 				if (leftControllerState.ulButtonPressed & vr::ButtonMaskFromId(vr::k_EButton_Axis0)) {
-					std::cout << "joystick Pressed in\n";
 					axis_left.x = leftControllerState.rAxis->x;
 					axis_left.y = leftControllerState.rAxis->y;
 
@@ -381,7 +370,5 @@ int main()
 		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(20));
 	}
-
-
 	return 1;
 }
