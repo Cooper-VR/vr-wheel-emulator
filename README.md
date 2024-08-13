@@ -12,9 +12,6 @@
  - headlights, might be buggy, idk
  - change grip sensitivty in steamvr if using knuckles, makes grip settings default
  - overlay attached to HMD to see the left-hand modes like brake vs clutch vs lights vs handbrake
-<h2>TODO</h2>
-
- - Add light GUI for mode selection
 
 <h2>WINDOWS</h2>
 
