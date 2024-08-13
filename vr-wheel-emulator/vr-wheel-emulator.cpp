@@ -9,7 +9,7 @@
 #include "headers/glad.h"
 #include "GLFW/glfw3.h"
 
-char path[] = "E:/cooperBower/github/vr-wheel-emulator/vr-wheel-emulator/";
+char path[] = "";
 char basePath[] = "images/base.png";
 char brakePath[] = "images/brake.png";
 char handbrakePath[] = "images/handbrake.png";
