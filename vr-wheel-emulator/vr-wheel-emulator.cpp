@@ -9,7 +9,7 @@
 #include "headers/glad.h"
 #include "GLFW/glfw3.h"
 
-char path[] = "E:/Capture1.PNG";
+char path[] = "";
 
 void processInput(GLFWwindow* window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
@@ -42,20 +42,24 @@ int main()
 		return -2;
 	}
 
-	vr::VROverlayHandle_t* handle = new vr::VROverlayHandle_t();
-	oOverlay->SetOverlayWidthInMeters(*handle, 1);
+	vr::VROverlayHandle_t handle;
+	vr::VROverlayHandle_t iconHandle;
+
+	const char* overlayKey = "com.cooper.vr-wheel-emulator";
+	const char* overlayName = "vr-wheel-emulator";
+	oOverlay->CreateDashboardOverlay(overlayKey, overlayName, &handle, &iconHandle);
+
+	oOverlay->SetOverlayColor(handle, 1, 1, 1);
+	oOverlay->SetOverlayAlpha(handle, 1);
+	oOverlay->SetOverlayWidthInMeters(handle, 1.0f);
 	vr::VRTextureBounds_t bounds;
 	bounds.uMin = 1;
 	bounds.uMax = 0;
 	bounds.vMin = 0;
 	bounds.vMax = 1;
-	oOverlay->GetOverlayTextureBounds(*handle, &bounds);
 
-	oOverlay->SetOverlayFromFile(*handle, path);
-	vr::VROverlayHandle_t* iconHandle = new vr::VROverlayHandle_t;
-
-	oOverlay->CreateDashboardOverlay("com.cooper.vr-wheel-emulator", "vr-wheel-emulator", handle, iconHandle);
-	oOverlay->ShowOverlay(*handle);
+	oOverlay->SetOverlayTextureBounds(handle, &bounds);
+	oOverlay->SetOverlayFromFile(handle, path);
 
 	if (!vJoyEnabled()) {
 		std::cerr << "vJoy driver not enabled: Failed to find vJoy device!" << std::endl;
@@ -91,11 +95,12 @@ int main()
 	UINT downShiftButton = 2;
 	UINT headlightButton = 3;
 	UINT hornButton = 4;
+
 	while (1) {
 
-		oOverlay->ShowOverlay(*handle);
+		oOverlay->ShowOverlay(handle);
 		//for vjoy
-		vJoyAxisX = static_cast<LONG>((wheelAngle / 90.0) * (16383 * 0.3)) + 16384;
+		vJoyAxisX = static_cast<LONG>((-wheelAngle / 90.0) * (16383 * 0.3)) + 16384;
 		vJoyAxisY = static_cast<LONG>(triggerValue_right * 32767);
 			
 
