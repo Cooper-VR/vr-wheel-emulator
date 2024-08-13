@@ -10,17 +10,17 @@
  - break/handbrake
  - wheel turning
  - headlights, might be buggy, idk
-
+ - change grip sensitivty in steamvr if using knuckles, makes grip settings default
 <h2>TODO</h2>
 
  - Add light GUI for mode selection
- - Changing grip sensitivty
 
 <h2>WINDOWS</h2>
 
 1. download winows branch of the project
 2. open in visual studio 2022, (openvr header and lib files are included)
-3. build.. thats it
+3. set up base link for images, watch <a>https://youtu.be/wLXZP1mrt2M</a><p> to see how</p>
+4. build.. thats it
 
 <h2>LINUX</h2>
 
