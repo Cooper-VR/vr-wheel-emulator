@@ -17,12 +17,14 @@
 https://www.youtube.com/watch?v=A1j3Tc6sNo0
 needs updating
 <h2>WINDOWS</h2>
+download and install vJoy(virtual joystick), <a href="https://sourceforge.net/projects/vjoystick/">https://sourceforge.net/projects/vjoystick/</a>
+then,
+download from releases OR you can build by following the steps below
 
 1. download winows branch of the project
-2. download and install vJoy(virtual joystick), <a href="https://sourceforge.net/projects/vjoystick/">https://sourceforge.net/projects/vjoystick/</a>
-3. open in visual studio 2022, (openvr header and lib files are included)
-4. set up base link for images, watch https://youtu.be/wLXZP1mrt2M to see how
-5. build.. thats it
+2. open in visual studio 2022, (openvr header and lib files are included)
+3. set up base link for images, watch https://youtu.be/wLXZP1mrt2M to see how
+4. build.. thats it
 
 <h2>LINUX</h2>
 
