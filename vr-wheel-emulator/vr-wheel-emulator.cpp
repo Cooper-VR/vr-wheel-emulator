@@ -9,7 +9,7 @@
 #include "headers/glad.h"
 #include "GLFW/glfw3.h"
 
-char path[] = "";
+char path[] = "E:/cooperBower/github/vr-wheel-emulator/vr-wheel-emulator/";
 char basePath[] = "images/base.png";
 char brakePath[] = "images/brake.png";
 char handbrakePath[] = "images/handbrake.png";
@@ -18,6 +18,9 @@ char lightPath[] = "images/lights.png";
 char clutchPath[] = "images/clutch.png";
 char currentPath[512];
 
+float speed = 2.7;
+
+bool modeSet = false;
 
 void processInput(GLFWwindow* window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
@@ -27,12 +30,14 @@ void processInput(GLFWwindow* window) {
 
 int main()
 {	
+	std::cout << "Enter path to images folder\n";
+	std::cin >> path;
+
 	bool brakeSet = false;
 	bool handbrakeSet = false;
 	bool clutchSet = false;
 	bool lightsSet = false;
 	bool unusedSet = false;
-
 
 	bool shifted = false;
 	bool ungrippedLeft = true;
@@ -41,11 +46,17 @@ int main()
 	bool turnedOff = true;
 	bool turnedOn = false;
 
+	bool gripPrintedLeft = false;
+	bool gripPrintedRight = false;
+
+	bool buttonsPressed[16];
+
 	vr::EVRInitError eError = vr::VRInitError_None;
 	vr::IVRSystem* pSystem = vr::VR_Init(&eError, vr::VRApplication_Overlay);
 
 	if (eError != vr::VRInitError_None) {
 		std::cout << "Failed to iniitalize, is SteamVR running\n";
+		std::cin.get();
 		return -1;
 	}
 	std::cout << "OpenVR initalized\n";
@@ -54,6 +65,7 @@ int main()
 	if (eError != vr::VRInitError_None || !oOverlay) {
 		std::cerr << "Failed to get overlay interface\n";
 		vr::VR_Shutdown();
+		std::cin.get();
 		return -2;
 	}
 
@@ -78,6 +90,7 @@ int main()
 
 	if (!vJoyEnabled()) {
 		std::cerr << "vJoy driver not enabled: Failed to find vJoy device!" << std::endl;
+		std::cin.get();
 		return -2;
 	}
 	std::cout << "vjoy enabled\n";
@@ -87,10 +100,12 @@ int main()
 	VjdStat status = GetVJDStatus(iInterface);
 	if (status != VJD_STAT_FREE && status != VJD_STAT_OWN) {
 		std::cerr << "vJoy device " << iInterface << " not available.\n";
+		std::cin.get();
 		return -1;
 	}
 	if (!AcquireVJD(iInterface)) {
 		std::cerr << "Failed to acquire vJoy device " << iInterface << ".\n";
+		std::cin.get();
 		return -1;
 	}
 	std::cout << "vjoy all setup\n";
@@ -100,21 +115,24 @@ int main()
 	leftControllerIndex = pSystem->GetTrackedDeviceIndexForControllerRole(vr::TrackedControllerRole_LeftHand);
 	auto lastTime = std::chrono::high_resolution_clock::now();
 
-	LONG vJoyAxisX;
-	LONG vJoyAxisY;
-	LONG vJoyAxisZ = 0;
-	LONG vJoyAxisXY = 0;
-	LONG vJoyAxisXZ = 0;
+	vJoyAxisZ = 0;
+	vJoyAxisXY = 0;
+	vJoyAxisXZ = 0;
 
-	UINT upShiftButton = 1;
-	UINT downShiftButton = 2;
-	UINT headlightButton = 3;
-	UINT hornButton = 4;
+	upShiftButton = 14;
+	downShiftButton = 12;
+	headlightButton = 3;
+	hornButton = 4;
 
 	vr::HmdMatrix34_t transform;
 
 	sprintf_s(currentPath, "%s%s", path, basePath);
 	oOverlay->SetOverlayFromFile(handle, currentPath);
+
+	for (size_t i = 0; i < 16; i++)
+	{
+		buttonsPressed[i] = false;
+	}
 
 	while (1) {
 		transform.m[0][0] = 1.0f;  transform.m[0][1] = 0.0f;  transform.m[0][2] = 1.0f;  transform.m[0][3] = -0.2f;
@@ -125,9 +143,8 @@ int main()
 		oOverlay->SetOverlayTransformTrackedDeviceRelative(handle, vr::k_unTrackedDeviceIndex_Hmd, &transform);
 		oOverlay->ShowOverlay(handle);
 		//for vjoy
-		vJoyAxisX = static_cast<LONG>((-wheelAngle / 90.0) * (16383 * 0.3)) + 16384;
-		vJoyAxisY = static_cast<LONG>(triggerValue_right * 32767);
-			
+		vJoyAxisY = static_cast<LONG>((triggerValue_right * -32767) + 32767);
+
 
 		JOYSTICK_POSITION_V2 iReport;
 		iReport.bDevice = iInterface;
@@ -136,14 +153,39 @@ int main()
 		iReport.wAxisZ = vJoyAxisZ;
 		iReport.wAxisXRot = vJoyAxisXY;
 		iReport.wAxisYRot = vJoyAxisXZ;
-		
 
-
-		// Update the vJoy device
-		if (!UpdateVJD(iInterface, &iReport)) {
-			std::cerr << "Failed to update vJoy device.\n";
+		for (int i = 0; i < 128; ++i) {
+			iReport.lButtons &= ~(1 << i);  // Set each button to false
 		}
 
+
+		SetBtn(false, iInterface, 2);
+
+		if (!modeSet) {
+			char mode;
+			std::cout << "Set up input? y or n";
+			std::cin >> mode;
+
+			if (mode == 'y') {
+				for (size_t i = 1; i <= 16; i++)
+				{
+					buttonsPressed[i-1] = false;
+					SetBtn(false, iInterface, i);
+				}
+
+
+				steamCalibrate(iInterface, &iReport);
+				modeSet = true;
+
+				std::cout << "Calibration complete\n";
+			}
+			else {
+				modeSet = true;
+			}
+		}
+
+
+		
 		//for deltaTime
 		auto currentTime = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<double> elapsed = currentTime - lastTime;
@@ -166,18 +208,20 @@ int main()
 				if (axis_right.GetMagnitude() > 0.1f) {
 					if (axis_right.y > gear_shift_sense && !shifted) {
 						std::cout << "up-shift\n";
-						SetBtn(true, iInterface, upShiftButton);
+						buttonsPressed[upShiftButton] = true;
+						buttonsPressed[downShiftButton] = false;
 						shifted = true;
 					}
 					else if (axis_right.y < -gear_shift_sense && !shifted) {
 						std::cout << "down-shift\n";
-						SetBtn(true, iInterface, downShiftButton);
+						buttonsPressed[downShiftButton] = true;
+						buttonsPressed[upShiftButton] = false;
 						shifted = true;
 					}
 				}
 				else {
-					SetBtn(false, iInterface, upShiftButton);
-					SetBtn(false, iInterface, downShiftButton);
+					buttonsPressed[upShiftButton] = false;
+					buttonsPressed[downShiftButton] = false;
 					shifted = false;
 				}
 
@@ -191,11 +235,15 @@ int main()
 					axis_right.y = 0;
 				}
 				if (rightControllerState.ulButtonPressed & vr::ButtonMaskFromId(vr::k_EButton_Grip)) {
-					std::cout << "gripping wheel\n";
+					if (!gripPrintedRight) {
+						std::cout << "gripping wheel\n";
+						gripPrintedRight = true;
+					}
 					ungrippedRight = false;
-					wheelAngle += angularVelocity_right.z * deltaTime;
+					wheelAngle += angularVelocity_right.z * deltaTime * speed;
 				}
 				else {
+					gripPrintedRight = false;
 					ungrippedRight = true;
 				}
 			}
@@ -207,28 +255,18 @@ int main()
 				triggerValue_left = leftControllerState.rAxis[1].x;
 				//std::cout << "trigger amount: " << triggerValue_left << std::endl;
 
-				if (triggerValue_left > 0) {
-
-					if (currentMode == headlights && !turnedOn) {
-						SetBtn(false, iInterface, headlightButton);
-						std::cout << "headlights: on\n";
-						turnedOn = true;
-						turnedOff = false;
-					}
+				if (triggerValue_left > 0.8 && currentMode == headlights) {
+					buttonsPressed[headlightButton] = true;
+					buttonsPressed[hornButton] = false;
 				}
-				else if (!turnedOff){
-					std::cout << "headlights: off\n";
-					SetBtn(true, iInterface, headlightButton);
-					turnedOff = true;
-					turnedOn = false;
-				}
-				if (triggerValue_left > 0.8) {
-					SetBtn(true, iInterface, hornButton);
+				else if (triggerValue_left > 0.8 && currentMode == horn) {
+					buttonsPressed[hornButton] = true;
+					buttonsPressed[headlightButton] = false;
 
 				}
-				else {
-					SetBtn(false, iInterface, hornButton);
-
+				else if (triggerValue_left <= 0.8){
+					buttonsPressed[hornButton] = false;
+					buttonsPressed[headlightButton] = false;
 				}
 
 				if (axis_left.GetMagnitude() > mode_change_sense) {
@@ -293,6 +331,7 @@ int main()
 
 					}
 					else if ((angle >= 252 && angle < 360 - 36) && !brakeSet){
+						currentMode = extra;
 						clutchSet = false;
 						lightsSet = false;
 						unusedSet = false;
@@ -309,12 +348,8 @@ int main()
 					std::cout << angle << ":" << currentMode << '\n';
 				}
 				if (leftControllerState.ulButtonPressed & vr::ButtonMaskFromId(vr::k_EButton_ApplicationMenu)) {
-					//SetBtn(true, iInterface, headlightButton);
 					std::cout << "b-button-left pressed\n";
-				}
-				else {
-					//SetBtn(false, iInterface, headlightButton);
-				}
+				}	
 				if (leftControllerState.ulButtonPressed & vr::ButtonMaskFromId(vr::k_EButton_Axis0)) {
 					axis_left.x = leftControllerState.rAxis->x;
 					axis_left.y = leftControllerState.rAxis->y;
@@ -325,11 +360,15 @@ int main()
 					axis_left.y = 0;
 				}
 				if (leftControllerState.ulButtonPressed & vr::ButtonMaskFromId(vr::k_EButton_Grip)) {
-					std::cout << "gripping\n";
+					if (!gripPrintedLeft) {
+						std::cout << "gripping wheel\n";
+						gripPrintedLeft = true;
+					}
 					ungrippedLeft = false;
-					wheelAngle += angularVelocity_left.z * deltaTime;
+					wheelAngle += angularVelocity_left.z * deltaTime * speed;
 				}
 				else {
+					gripPrintedLeft = false;
 					ungrippedLeft = true;
 				}
 			}
@@ -352,22 +391,53 @@ int main()
 		if (triggerValue_left > 0) {
 			switch (currentMode) {
 			case brake:
-				vJoyAxisZ = static_cast<LONG>(triggerValue_left * 32767);
-				vJoyAxisXY = 0;
-				vJoyAxisXZ = 0;
+				SetBtn(false, iInterface, 9);
+				buttonsPressed[6] = false;
+				buttonsPressed[10] = false;
+				vJoyAxisZ = static_cast<LONG>(triggerValue_left * 2 * 16384) + 16384;
+				vJoyAxisXZ = 16383;
 				break;
 			case handBrake:
-				vJoyAxisXY = static_cast<LONG>(triggerValue_left * 32767);
-				vJoyAxisZ = 0;
-				vJoyAxisXZ = 0;
+				buttonsPressed[6] = true;
+				buttonsPressed[10] = false;
+				vJoyAxisZ = 16383;
+				vJoyAxisXZ = 16384;
 				break;
 			case clutch:
-				vJoyAxisXZ = static_cast<LONG>(triggerValue_left * 32767);
-				vJoyAxisZ = 0;
-				vJoyAxisXY = 0;
+				buttonsPressed[6] = false;
+				buttonsPressed[10] = false;
+				vJoyAxisZ = 16383;
+				vJoyAxisXZ = static_cast<LONG>(triggerValue_left * 2 * 16384) + 16384;
+				break;
+			case extra:
+				buttonsPressed[10] = true;
+				buttonsPressed[6] = false;
+				vJoyAxisZ = 16383;
+				vJoyAxisXZ = 16383;
 				break;
 			}
 		}
+		else {
+			buttonsPressed[6] = false;
+			buttonsPressed[10] = false;
+			vJoyAxisZ = 16383;
+			vJoyAxisXZ = 16383;
+		}
+		iReport.bDevice = iInterface;
+		iReport.wAxisY = vJoyAxisY;
+		iReport.wAxisZ = vJoyAxisZ;
+		vJoyAxisX = static_cast<LONG>((wheelAngle / 90.0) * (16383 * 0.3)) + 16384;
+		iReport.wAxisX = vJoyAxisX;
+		iReport.wAxisYRot = vJoyAxisXY;
+		iReport.wAxisZRot = vJoyAxisXZ;
+
+		UpdateVJD(iInterface, &iReport);
+
+		for (size_t i = 1; i <= 16; i++)
+		{
+			SetBtn(buttonsPressed[i-1], iInterface, i);
+		}	
+
 		std::this_thread::sleep_for(std::chrono::milliseconds(20));
 	}
 	return 1;

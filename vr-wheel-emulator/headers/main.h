@@ -14,10 +14,20 @@ const float gear_shift_sense = 0.25;
 const float mode_change_sense = 0.2;
 double deltaTime = 0.0;
 float wheelAngle = 0;
-const float wheelReboundSpeed = 100;
+const float wheelReboundSpeed = 300;
 vr::TrackedDevicePose_t trackedDevicesPose[vr::k_unMaxTrackedDeviceCount];
 float triggerValue_right;
 float triggerValue_left;
+LONG vJoyAxisX;
+LONG vJoyAxisY;
+LONG vJoyAxisZ = 0;
+LONG vJoyAxisXY = 0;
+LONG vJoyAxisXZ = 0;
+
+UINT upShiftButton = 14;
+UINT downShiftButton = 12;
+UINT headlightButton = 3;
+UINT hornButton = 4;
 
 /// <summary>
 /// an easier way to store three values like x, y, z
@@ -114,26 +124,185 @@ enum leftHandModes {
     headlights = 12,
     horn = 13,
     clutch = 14,
+	extra = 15,
     none = 9
 };
 
-void sendSteeringAngleToVJoy() {
-    UINT iInterface = 1; // vJoy device ID
-
-    // Normalize the angle to vJoy X-axis range (-32767 to 32767)
-    // Assuming angle ranges from -90 to 90 degrees
-    LONG vJoyAxisX = static_cast<LONG>((wheelAngle / 90.0) * (16383 * 0.3)) + 16384;
-    LONG vJoyAxisY = static_cast<LONG>(triggerValue_right * 32767);
-
-    JOYSTICK_POSITION_V2 iReport;
-    iReport.bDevice = iInterface;
-    iReport.wAxisX = vJoyAxisX; // Set the X-axis to the normalized value
-    iReport.wAxisY = vJoyAxisY;
-
-    // Update the vJoy device
-    if (!UpdateVJD(iInterface, &iReport)) {
-        std::cerr << "Failed to update vJoy device.\n";
+void setButton(UINT device, UINT button) {
+    int i = 0;
+    SetBtn(true, device, button);
+    while (i < 50) {
+		i++;
+		std::this_thread::sleep_for(std::chrono::milliseconds(20));
     }
+	SetBtn(false, device, button);
+
+}
+void setConfigAxis(UINT device, JOYSTICK_POSITION_V2* report) {
+	std::cout << "setting axisX\n";
+	report->wAxisX = 16384;
+    UpdateVJD(device, report);
+	while (report->wAxisX > 0) {
+		report->wAxisX -= 30;
+		UpdateVJD(device, report);
+		std::this_thread::sleep_for(std::chrono::milliseconds(5));
+	}
+	while (report->wAxisX < 16384) {
+		report->wAxisX += 30;
+		UpdateVJD(device, report);
+		std::this_thread::sleep_for(std::chrono::milliseconds(5));
+	}
+
+	report->wAxisX = 16384;
+    UpdateVJD(device, report);
+	while (report->wAxisX < 32768) {
+		report->wAxisX += 30;
+		UpdateVJD(device, report);
+		std::this_thread::sleep_for(std::chrono::milliseconds(5));
+	}
+	while (report->wAxisX > 16384) {
+		report->wAxisX -= 30;
+		UpdateVJD(device, report);
+		std::this_thread::sleep_for(std::chrono::milliseconds(5));
+	}
+	report->wAxisX = 16384;
+
+
+    std::cout << "setting axisY\n";
+	report->wAxisY = 16384;
+    UpdateVJD(device, report);
+	while (report->wAxisY > 0) {
+		report->wAxisY -= 30;
+		UpdateVJD(device, report);
+		std::this_thread::sleep_for(std::chrono::milliseconds(5));
+	}
+	while (report->wAxisY < 16384) {
+		report->wAxisY += 30;
+		UpdateVJD(device, report);
+		std::this_thread::sleep_for(std::chrono::milliseconds(5));
+	}
+
+	report->wAxisY = 16384;
+    UpdateVJD(device, report);
+	while (report->wAxisY < 32768) {
+		report->wAxisY += 30;
+		UpdateVJD(device, report);
+		std::this_thread::sleep_for(std::chrono::milliseconds(5));
+	}
+	while (report->wAxisY > 16384) {
+		report->wAxisY -= 30;
+		UpdateVJD(device, report);
+		std::this_thread::sleep_for(std::chrono::milliseconds(5));
+	}
+	report->wAxisY = 16384;
+	setButton(device, 9);
+
+
+
+	std::cout << "setting axisZ\n";
+	report->wAxisZ = 16384;
+    UpdateVJD(device, report);
+	while (report->wAxisZ > 0) {
+		report->wAxisZ -= 30;
+		UpdateVJD(device, report);
+		std::this_thread::sleep_for(std::chrono::milliseconds(5));
+	}
+	while (report->wAxisZ < 16384) {
+		report->wAxisZ += 30;
+		UpdateVJD(device, report);
+		std::this_thread::sleep_for(std::chrono::milliseconds(5));
+	}
+
+	report->wAxisZ = 16384;
+    UpdateVJD(device, report);
+	while (report->wAxisZ < 32768) {
+		report->wAxisZ += 30;
+		UpdateVJD(device, report);
+		std::this_thread::sleep_for(std::chrono::milliseconds(5));
+	}
+	while (report->wAxisZ > 16384) {
+		report->wAxisZ -= 30;
+		UpdateVJD(device, report);
+		std::this_thread::sleep_for(std::chrono::milliseconds(5));
+	}
+	report->wAxisZ = 16384;
+
+
+	report->wAxisZRot = 16384;
+    UpdateVJD(device, report);
+	while (report->wAxisZRot < 32768) {
+		report->wAxisZRot += 30;
+		UpdateVJD(device, report);
+		std::this_thread::sleep_for(std::chrono::milliseconds(5));
+	}
+	while (report->wAxisZRot > 16384) {
+		report->wAxisZRot -= 30;
+		UpdateVJD(device, report);
+		std::this_thread::sleep_for(std::chrono::milliseconds(5));
+	}
+	report->wAxisZRot = 16384;
+
+	report->wAxisZRot = 16384;
+    UpdateVJD(device, report);
+	while (report->wAxisZRot > 0) {
+		report->wAxisZRot -= 30;
+		UpdateVJD(device, report);
+		std::this_thread::sleep_for(std::chrono::milliseconds(5));
+	}
+	while (report->wAxisZRot < 16384) {
+		report->wAxisZRot += 30;
+		UpdateVJD(device, report);
+		std::this_thread::sleep_for(std::chrono::milliseconds(5));
+	}
+	report->wAxisZ = 16384;
+
+
+}
+
+
+void steamCalibrate(UINT device,JOYSTICK_POSITION_V2 *report) {
+    int i = 0;
+
+	std::cout << "setting buttons\n";
+    for (UINT d = 1; d <= 8; d++)
+    {
+		setButton(device, d);
+    }
+
+	for (size_t i = 1; i < 16; i++)
+	{
+		SetBtn(false, device, i);
+	}
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+
+    setConfigAxis(device, report);
+
+    //trigger
+	for (size_t i = 10; i <= 18; i++)
+	{
+		if (i == 12) {
+			std::cout << "setting trigger\n";
+			report->wAxisXRot = 0;
+			UpdateVJD(device, report);
+			while (report->wAxisXRot < 32768) {
+				report->wAxisXRot += 30;
+				UpdateVJD(device, report);
+				std::this_thread::sleep_for(std::chrono::milliseconds(5));
+			}
+			while (report->wAxisXRot > 0) {
+				report->wAxisXRot -= 30;
+				UpdateVJD(device, report);
+				std::this_thread::sleep_for(std::chrono::milliseconds(5));
+			}
+			report->wAxisXRot = 0;
+
+		}
+		else {
+			setButton(device, i);
+		}
+	}
 }
 
 leftHandModes currentMode = none;
