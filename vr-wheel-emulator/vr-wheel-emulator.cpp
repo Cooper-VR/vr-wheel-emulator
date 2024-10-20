@@ -18,7 +18,7 @@ char lightPath[] = "images/lights.png";
 char clutchPath[] = "images/clutch.png";
 char currentPath[512];
 
-float speed = 2.7;
+float speed = 2.2;
 
 bool modeSet = false;
 
