@@ -298,7 +298,24 @@ void steamCalibrate(UINT device,JOYSTICK_POSITION_V2 *report) {
 			}
 			report->wAxisXRot = 0;
 
+		}else if (i == 14) {
+			std::cout << "setting trigger2\n";
+			report->wAxisYRot = 0;
+			UpdateVJD(device, report);
+			while (report->wAxisYRot < 32768) {
+				report->wAxisYRot += 30;
+				UpdateVJD(device, report);
+				std::this_thread::sleep_for(std::chrono::milliseconds(5));
+			}
+			while (report->wAxisYRot > 0) {
+				report->wAxisYRot -= 30;
+				UpdateVJD(device, report);
+				std::this_thread::sleep_for(std::chrono::milliseconds(5));
+			}
+			report->wAxisYRot = 0;
+
 		}
+
 		else {
 			setButton(device, i);
 		}

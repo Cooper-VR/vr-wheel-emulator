@@ -20,7 +20,10 @@ char currentPath[512];
 
 float speed = 2.2;
 
+bool invertPedals = false;
 bool modeSet = false;
+bool handBrakeStyle = false;
+bool invertedSteering = false;
 
 void processInput(GLFWwindow* window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
@@ -119,8 +122,8 @@ int main()
 	vJoyAxisXY = 0;
 	vJoyAxisXZ = 0;
 
-	upShiftButton = 14;
-	downShiftButton = 12;
+	upShiftButton = 1;
+	downShiftButton = 2;
 	headlightButton = 3;
 	hornButton = 4;
 
@@ -134,6 +137,39 @@ int main()
 		buttonsPressed[i] = false;
 	}
 
+	if (!handBrakeStyle) {
+		char mode;
+		std::cout << "HandBrake as Axis rather than button (y or n) ";
+		std::cin >> mode;
+
+		if (mode == 'y') {
+			handBrakeStyle = true;
+		}
+	}
+
+	if (!invertPedals) {
+		char mode;
+		std::cout << "is gas pedal inverted? (y or n) ";
+		std::cin >> mode;
+
+		if (mode == 'y') {
+			handBrakeStyle = true;
+		}
+	}
+	if (!invertedSteering) {
+		char mode;
+		std::cout << "is steering inverted? (y or n) ";
+		std::cin >> mode;
+
+		if (mode == 'y') {
+			invertedSteering = true;
+			speed *= -1;
+		}
+	}
+
+
+
+
 	while (1) {
 		transform.m[0][0] = 1.0f;  transform.m[0][1] = 0.0f;  transform.m[0][2] = 1.0f;  transform.m[0][3] = -0.2f;
 		transform.m[1][0] = 0.0f;  transform.m[1][1] = 1.0f;  transform.m[1][2] = 0.0f;  transform.m[1][3] = -0.1f;
@@ -143,7 +179,12 @@ int main()
 		oOverlay->SetOverlayTransformTrackedDeviceRelative(handle, vr::k_unTrackedDeviceIndex_Hmd, &transform);
 		oOverlay->ShowOverlay(handle);
 		//for vjoy
-		vJoyAxisY = static_cast<LONG>((triggerValue_right * -32767) + 32767);
+		if (invertPedals) {
+			vJoyAxisY = static_cast<LONG>((triggerValue_right * -32767) + 32767);
+		}
+		else {
+			vJoyAxisY = static_cast<LONG>((triggerValue_right * 32767));
+		}
 
 
 		JOYSTICK_POSITION_V2 iReport;
@@ -163,7 +204,7 @@ int main()
 
 		if (!modeSet) {
 			char mode;
-			std::cout << "Set up input? y or n";
+			std::cout << "Set up input? y or n ";
 			std::cin >> mode;
 
 			if (mode == 'y') {
@@ -376,10 +417,10 @@ int main()
 
 		//handles when wheel is let go
 		if (ungrippedLeft && ungrippedRight && (wheelAngle < -0.8 || wheelAngle > 0.8)) {
-			if (wheelAngle > 0) {
+			if (wheelAngle > 10) {
 				wheelAngle -= wheelReboundSpeed * deltaTime;
 			}
-			else if (wheelAngle < 0) {
+			else if (wheelAngle < -10) {
 				wheelAngle += wheelReboundSpeed * deltaTime;
 			}
 		}
@@ -391,34 +432,58 @@ int main()
 		if (triggerValue_left > 0) {
 			switch (currentMode) {
 			case brake:
-				SetBtn(false, iInterface, 9);
-				buttonsPressed[6] = false;
+				if (!handBrakeStyle) {
+					buttonsPressed[6] = false;
+				}
+				else {
+					vJoyAxisXY = 16383;
+				}
 				buttonsPressed[10] = false;
 				vJoyAxisZ = static_cast<LONG>(triggerValue_left * 2 * 16384) + 16384;
 				vJoyAxisXZ = 16383;
 				break;
 			case handBrake:
-				buttonsPressed[6] = true;
+				if (!handBrakeStyle) {
+					buttonsPressed[6] = true;
+				}
+				else {
+					vJoyAxisXY = static_cast<LONG>(triggerValue_left * 2 * 16384);
+				}
 				buttonsPressed[10] = false;
 				vJoyAxisZ = 16383;
 				vJoyAxisXZ = 16384;
 				break;
 			case clutch:
-				buttonsPressed[6] = false;
+				if (!handBrakeStyle) {
+					buttonsPressed[6] = false;
+				}
+				else {
+					vJoyAxisXY = 16383;
+				}
 				buttonsPressed[10] = false;
 				vJoyAxisZ = 16383;
 				vJoyAxisXZ = static_cast<LONG>(triggerValue_left * 2 * 16384) + 16384;
 				break;
 			case extra:
 				buttonsPressed[10] = true;
-				buttonsPressed[6] = false;
+				if (!handBrakeStyle) {
+					buttonsPressed[6] = false;
+				}
+				else {
+					vJoyAxisXY = 16383;
+				}
 				vJoyAxisZ = 16383;
 				vJoyAxisXZ = 16383;
 				break;
 			}
 		}
 		else {
-			buttonsPressed[6] = false;
+			if (!handBrakeStyle) {
+				buttonsPressed[6] = false;
+			}
+			else {
+				vJoyAxisXY = 16383;
+			}
 			buttonsPressed[10] = false;
 			vJoyAxisZ = 16383;
 			vJoyAxisXZ = 16383;
@@ -428,6 +493,7 @@ int main()
 		iReport.wAxisZ = vJoyAxisZ;
 		vJoyAxisX = static_cast<LONG>((wheelAngle / 90.0) * (16383 * 0.3)) + 16384;
 		iReport.wAxisX = vJoyAxisX;
+		iReport.wAxisXRot = 16383;
 		iReport.wAxisYRot = vJoyAxisXY;
 		iReport.wAxisZRot = vJoyAxisXZ;
 

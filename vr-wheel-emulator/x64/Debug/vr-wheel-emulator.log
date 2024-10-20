@@ -5,16 +5,16 @@ E:\cooperBower\github\vr-wheel-emulator\vr-wheel-emulator\headers\main.h(14,33):
 E:\cooperBower\github\vr-wheel-emulator\vr-wheel-emulator\headers\main.h(274,25): warning C4267: 'argument': conversion from 'size_t' to 'UCHAR', possible loss of data
   (compiling source file 'vr-wheel-emulator.cpp')
   
-E:\cooperBower\github\vr-wheel-emulator\vr-wheel-emulator\headers\main.h(303,22): warning C4267: 'argument': conversion from 'size_t' to 'UINT', possible loss of data
+E:\cooperBower\github\vr-wheel-emulator\vr-wheel-emulator\headers\main.h(320,22): warning C4267: 'argument': conversion from 'size_t' to 'UINT', possible loss of data
   (compiling source file 'vr-wheel-emulator.cpp')
   
 E:\cooperBower\github\vr-wheel-emulator\vr-wheel-emulator\vr-wheel-emulator.cpp(21,13): warning C4305: 'initializing': truncation from 'double' to 'float'
-E:\cooperBower\github\vr-wheel-emulator\vr-wheel-emulator\vr-wheel-emulator.cpp(173,32): warning C4267: 'argument': conversion from 'size_t' to 'UCHAR', possible loss of data
-E:\cooperBower\github\vr-wheel-emulator\vr-wheel-emulator\vr-wheel-emulator.cpp(243,56): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
-E:\cooperBower\github\vr-wheel-emulator\vr-wheel-emulator\vr-wheel-emulator.cpp(275,25): warning C4305: '*=': truncation from 'double' to 'float'
-E:\cooperBower\github\vr-wheel-emulator\vr-wheel-emulator\vr-wheel-emulator.cpp(368,55): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
-E:\cooperBower\github\vr-wheel-emulator\vr-wheel-emulator\vr-wheel-emulator.cpp(380,37): warning C4244: '-=': conversion from 'double' to 'float', possible loss of data
-E:\cooperBower\github\vr-wheel-emulator\vr-wheel-emulator\vr-wheel-emulator.cpp(383,37): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
-E:\cooperBower\github\vr-wheel-emulator\vr-wheel-emulator\vr-wheel-emulator.cpp(438,44): warning C4267: 'argument': conversion from 'size_t' to 'UCHAR', possible loss of data
-E:\cooperBower\github\vr-wheel-emulator\vr-wheel-emulator\vr-wheel-emulator.cpp(113,26): warning C4101: 'trackedDevicesPose': unreferenced local variable
+E:\cooperBower\github\vr-wheel-emulator\vr-wheel-emulator\vr-wheel-emulator.cpp(214,32): warning C4267: 'argument': conversion from 'size_t' to 'UCHAR', possible loss of data
+E:\cooperBower\github\vr-wheel-emulator\vr-wheel-emulator\vr-wheel-emulator.cpp(284,56): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+E:\cooperBower\github\vr-wheel-emulator\vr-wheel-emulator\vr-wheel-emulator.cpp(316,25): warning C4305: '*=': truncation from 'double' to 'float'
+E:\cooperBower\github\vr-wheel-emulator\vr-wheel-emulator\vr-wheel-emulator.cpp(409,55): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+E:\cooperBower\github\vr-wheel-emulator\vr-wheel-emulator\vr-wheel-emulator.cpp(421,37): warning C4244: '-=': conversion from 'double' to 'float', possible loss of data
+E:\cooperBower\github\vr-wheel-emulator\vr-wheel-emulator\vr-wheel-emulator.cpp(424,37): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+E:\cooperBower\github\vr-wheel-emulator\vr-wheel-emulator\vr-wheel-emulator.cpp(504,44): warning C4267: 'argument': conversion from 'size_t' to 'UCHAR', possible loss of data
+E:\cooperBower\github\vr-wheel-emulator\vr-wheel-emulator\vr-wheel-emulator.cpp(116,26): warning C4101: 'trackedDevicesPose': unreferenced local variable
   vr-wheel-emulator.vcxproj -> E:\cooperBower\github\vr-wheel-emulator\x64\Debug\vr-wheel-emulator.exe
